@@ -1,0 +1,24 @@
+﻿@using System.Globalization
+@inject IJSRuntime JS
+@code {
+    private bool _cultureSet = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !_cultureSet)
+        {
+            var existingCulture = await JS.InvokeAsync<string>("blazorCulture.get");
+            var culture = !string.IsNullOrEmpty(existingCulture)
+                            ? new CultureInfo(existingCulture)
+                            : new CultureInfo("en-US");
+
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
+            Console.WriteLine($"Culture set to: {culture.Name}");
+
+            _cultureSet = true;
+
+            StateHasChanged(); // لإعادة الرسم بعد تغيير الثقافة
+        }
+    }
+}

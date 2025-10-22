@@ -1,0 +1,49 @@
+﻿@using SafeReport.Web.DTOs
+@using SafeReport.Web.Services
+@inject NotificationService NotificationService
+@inject IJSRuntime JS
+
+<div class="position-relative m-2">
+    <i class="bi bi-bell-fill"></i>
+    <span class="badge bg-danger">@newReportsCount</span>
+</div>
+
+@code {
+    private int newReportsCount = 0;
+    private CancellationTokenSource? _resetToken;
+
+    protected override async Task OnInitializedAsync()
+    {
+        NotificationService.OnNewReport += HandleNewReport;
+        await NotificationService.StartAsync();
+    }
+
+    private void HandleNewReport(ReportDTO report)
+    {
+        newReportsCount++;
+
+        // Show native browser alert
+        _ = JS.InvokeVoidAsync("alert", "📢 New report received!");
+
+        InvokeAsync(StateHasChanged);
+
+        // Cancel any existing timer
+        _resetToken?.Cancel();
+        _resetToken = new CancellationTokenSource();
+
+        // Reset count after 1 minute
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(TimeSpan.FromMinutes(1), _resetToken.Token);
+                newReportsCount = 0;
+                await InvokeAsync(StateHasChanged);
+            }
+            catch (TaskCanceledException)
+            {
+                // Another report arrived before 1 minute — skip reset
+            }
+        });
+    }
+}

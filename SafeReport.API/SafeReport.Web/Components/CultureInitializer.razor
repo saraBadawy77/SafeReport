@@ -1,0 +1,10 @@
+﻿
+<div class="form-group d-flex align-items-center gap-2">
+    <label for="cultureSelect" class="mb-0">Language:</label>
+    <select id="cultureSelect" class="form-control" style="width: auto;" @bind="_culture">
+        @foreach (var culture in SupportedCultures)
+        {
+            <option value="@culture.Name">@culture.DisplayName</option>
+        }
+    </select>
+</div>

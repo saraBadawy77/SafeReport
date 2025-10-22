@@ -1,0 +1,88 @@
+﻿@page "/reports"
+@using SafeReport.Web.DTOs
+@using SafeReport.Web.Services
+
+<PageTitle>Reports</PageTitle>
+
+<h3 class="mb-4">Reports List</h3>
+
+<div class="row mb-3">
+    <div class="col-md-3">
+        <input type="date" class="form-control" @bind="filterDate" />
+    </div>
+    <div class="col-md-3">
+        <select class="form-select" @bind="filterType">
+            <option value="">All Types</option>
+            @if (reportTypes != null && reportTypes.Any())
+            {
+                @foreach (var item in reportTypes)
+                {
+                    <option value="@item.Id">@item.Name</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="col-md-3">
+        <button class="btn btn-primary" @onclick="ApplyFilters">Filter</button>
+        <button class="btn btn-secondary ms-2" @onclick="ResetFilters">Reset</button>
+    </div>
+</div>
+
+
+@if (pagedReports is null || pagedReports.Count == 0)
+{
+    <p>Loading reports....</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Incident Type</th>
+                <th>Incident Name</th>
+                <th>Description</th>
+                <th>Created Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var report in pagedReports)
+            {
+                <tr>
+                    <td>@report.IncidentTypeName</td>
+                    <td>@report.IncidentName</td>
+                    <td>@report.Description</td>
+                    <td>@report.CreatedDate.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary me-2" @onclick="() => PrintReport(report.Id)">
+                            <i class="bi bi-printer"></i> Print
+                        </button>
+                        <button class="btn btn-sm btn-danger" @onclick="() => DeleteReport(report.Id)">
+                            <i class="bi bi-trash"></i> Delete
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <nav>
+        <ul class="pagination">
+            <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                <button class="page-link" @onclick="PrevPage">Previous</button>
+            </li>
+               @for (int i = 1; i <= totalPages; i++)
+                 {
+                var cpage = i; 
+               <li class="page-item @(currentPage == cpage ? "active" : "")">
+                 <button class="page-link" @onclick="() => GoToPage(cpage)">@cpage</button>
+               </li>
+                 }
+
+            <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                <button class="page-link" @onclick="NextPage">Next</button>
+            </li>
+        </ul>
+    </nav>
+}

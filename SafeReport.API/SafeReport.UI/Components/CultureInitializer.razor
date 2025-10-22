@@ -1,0 +1,53 @@
+﻿@using System.Globalization
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedLocalStorage LocalStorage
+@inject NavigationManager Navigation
+
+<div class="form-group d-flex align-items-center gap-2">
+    <label for="cultureSelect" class="mb-0">Language:</label>
+    <select id="cultureSelect" class="form-control" style="width: auto;"
+            @bind="selectedCulture"
+            @bind:after="ApplySelectedCulture">
+        @foreach (var culture in SupportedCultures)
+        {
+            <option value="@culture.Name">@culture.DisplayName</option>
+        }
+    </select>
+</div>
+
+@code {
+    private string selectedCulture;
+    private bool _initialized = false;
+
+    CultureInfo[] SupportedCultures = { new("ar-EG"), new("en-US") };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !_initialized)
+        {
+            var result = await LocalStorage.GetAsync<string>("UserCulture");
+            selectedCulture = result.Success ? result.Value : CultureInfo.CurrentUICulture.Name;
+
+            // Apply the culture immediately
+            var cultureInfo = new CultureInfo(selectedCulture);
+            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
+            _initialized = true;
+
+            StateHasChanged(); // update UI
+        }
+    }
+
+    private async Task ApplySelectedCulture()
+    {
+        var cultureInfo = new CultureInfo(selectedCulture);
+        CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+        CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
+        await LocalStorage.SetAsync("UserCulture", selectedCulture);
+
+        // Reload page to apply
+        Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+    }
+}
