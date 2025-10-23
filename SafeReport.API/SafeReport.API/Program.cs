@@ -23,6 +23,7 @@ namespace SafeReport.API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddAutoMapper(typeof(MappingProfile));
+            builder.Services.AddHttpContextAccessor();
             builder.Host.UseSerilogConfiguration(builder.Configuration);
 
             builder.Services.AddCors(options =>
@@ -50,8 +51,7 @@ namespace SafeReport.API
             app.UseHttpsRedirection();
             app.MapHub<ReportHub>("/reportHub");
             app.UseAuthorization();
-
-
+            app.UseStaticFiles();
             app.MapControllers();
 
             app.Run();

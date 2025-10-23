@@ -2,6 +2,7 @@
 using SafeReport.Web.DTOs;
 using SafeReport.Web.Interfaces;
 using System.Net.Http.Json;
+using static System.Net.WebRequestMethods;
 
 
 namespace SafeReport.Web.Services;
@@ -133,6 +134,27 @@ public class ReportService : IReportService
             return false;
         }
     }
+    public async Task<Response<ReportDTO>> ShowReportDetails(Guid reportId)
+    {
+        AddCultureHeader();
+        try
+        {
+            var response = await _httpClient.GetFromJsonAsync<Response<ReportDTO>>($"api/Report/GetById/{reportId}");
+            if (response != null && response.Success)
+            {
+                return response;
+            }
+            else
+            {
+                return Response<ReportDTO>.FailResponse("Failed to load report details.");
+            }
+        }
+        catch (Exception ex)
+        {
+            return Response<ReportDTO>.FailResponse($"Error fetching report details: {ex.Message}");
+        }
+    }
+
 
 
 }

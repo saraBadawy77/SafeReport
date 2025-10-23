@@ -97,8 +97,7 @@ namespace SafeReport.Infrastructure.Common
 
             return await query.AsNoTracking().ToListAsync();
         }
-        public async Task<T> FindAsync(Expression<Func<T, bool>> predicate,
-    Expression<Func<T, object>>[]? includes = null)
+        public async Task<T> FindAsync(Expression<Func<T, bool>> predicate, Expression<Func<T, object>>[]? includes = null)
         {
             IQueryable<T> query = _dbSet.Where(predicate);
 
@@ -117,5 +116,10 @@ namespace SafeReport.Infrastructure.Common
 
             return query.AsNoTracking().FirstOrDefault();
         }
+
+
+
+
+
     }
 }

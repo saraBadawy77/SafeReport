@@ -10,7 +10,7 @@ namespace SafeReport.Application.ISevices
 {
 	public interface IIncidentService
 	{
-		Task<Response<IEnumerable<IncidentDto>>> GetAllAsync(PaginationFilter filter);
+		Task<Response<IEnumerable<IncidentDto>>> GetAllAsync();
 		Task<Response<IncidentDto>> CreateAsync(CreateIncidentDto createIncidentDto);
 		Task<Response<bool>> UpdateAsync(int id, CreateIncidentDto createIncidentDto);
 		Task<Response<bool>> SoftDeleteAsync(int id);

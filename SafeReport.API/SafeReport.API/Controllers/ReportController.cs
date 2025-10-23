@@ -27,6 +27,16 @@ namespace SafeReport.API.Controllers
 
             return Response<PagedResultDto>.SuccessResponse(result.Data, "Reports retrieved successfully");
         }
+        [HttpGet("GetById/{id}")]
+        public async Task<Response<ReportDto>> GetById(Guid id)
+        {
+            var result = await _reportService.GetReportByIdAsync(id);
+
+            if (!result.Success)
+                return Response<ReportDto>.FailResponse(result.Message);
+
+            return Response<ReportDto>.SuccessResponse(result.Data, "Report retrieved successfully");
+        }
 
         [HttpDelete("SoftDelete/{id}")]
         public async Task<IActionResult> SoftDelete(Guid id)

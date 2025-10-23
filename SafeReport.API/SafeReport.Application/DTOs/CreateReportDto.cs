@@ -5,6 +5,7 @@ namespace SafeReport.Application.DTOs
     public class CreateReportDto
     {
         public string? Description { get; set; } = string.Empty;
+        public string? DescriptionAr { get; set; }
         public int IncidentId { get; set; }
         public int IncidentTypeId { get; set; }
         public IFormFile? Image { get; set; }
