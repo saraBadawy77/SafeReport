@@ -10,5 +10,6 @@ namespace SafeReport.Application.DTOs
         public IFormFile? Image { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
+        public string? PhoneNumber { get; set; }
     }
 }

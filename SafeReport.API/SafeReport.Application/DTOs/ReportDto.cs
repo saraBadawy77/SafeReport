@@ -10,7 +10,7 @@
 
         public int IncidentId { get; set; }
         public string IncidentName { get; set; }
-
+        public string? PhoneNumber { get; set; }
         public int IncidentTypeId { get; set; }
         public string IncidentTypeName { get; set; }
         public string Address { get; set; }

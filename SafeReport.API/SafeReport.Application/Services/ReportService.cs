@@ -104,6 +104,7 @@ namespace SafeReport.Application.Services
                         IncidentTypeName = incidentTypeName ?? "N/A",
                         Address = report.Address,
                         Image = report.ImagePath,
+                        PhoneNumber= report.PhoneNumber,
                         TimeSinceCreated = string.Empty
                     };
                 }).ToList();
