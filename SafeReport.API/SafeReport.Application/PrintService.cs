@@ -1,77 +1,106 @@
-﻿using iTextSharp.text;
-using iTextSharp.text.pdf;
-using SafeReport.Core.Models;
+﻿
+using QuestPDF.Fluent;
+using QuestPDF.Infrastructure;
 using System.Globalization;
-
+using SafeReport.Core.Models;
 namespace SafeReport.Application
 {
+
     public static class PrintService
     {
         public static byte[] GenerateReportPdf(Report report, IncidentType incidentType)
         {
-            using var memoryStream = new MemoryStream();
-            var document = new Document(PageSize.A4, 36, 36, 36, 36);
-            PdfWriter.GetInstance(document, memoryStream);
-            document.Open();
-
             var currentCulture = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+            bool isArabic = currentCulture == "ar";
 
-            string fontPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "arial.ttf");
-            BaseFont baseFont = BaseFont.CreateFont("C:\\Windows\\Fonts\\arial.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-            Font boldFont = new Font(baseFont, 16, Font.BOLD, BaseColor.Black);
+            string incidentName = isArabic ? (report.Incident?.NameAr ?? "لا يوجد اسم") : (report.Incident?.NameEn ?? "N/A");
+            string incidentTypeName = isArabic ? (incidentType?.NameAr ?? "لا يوجد نوع") : (incidentType?.NameEn ?? "N/A");
 
+            using var stream = new MemoryStream();
+            QuestPDF.Settings.License = LicenseType.Community;
 
-            PdfPTable table = new PdfPTable(5)
+            Document.Create(container =>
             {
-                WidthPercentage = 100,
-                RunDirection = currentCulture == "ar" ? PdfWriter.RUN_DIRECTION_RTL : PdfWriter.RUN_DIRECTION_LTR
-            };
-            table.SetWidths(new float[] { 2, 2, 2, 3, 2 });
+                container.Page(page =>
+                {
+                    page.Margin(40);
+                    page.DefaultTextStyle(x => x.FontSize(14).FontFamily("Arial"));
 
+                    page.Content().Column(col =>
+                    {
+                       
+                        col.Item()
+                           .AlignCenter()
+                           .PaddingBottom(20)
+                           .Text($"{incidentName} ({incidentTypeName})")
+                           .FontSize(20)
+                           .Bold();
 
-            AddHeaderCell(table, currentCulture == "ar" ? "اسم التقرير" : "Report Name", baseFont);
-            AddHeaderCell(table, currentCulture == "ar" ? "الحادث" : "Incident", baseFont);
-            AddHeaderCell(table, currentCulture == "ar" ? "نوع الحادث" : "Incident Type", baseFont);
-            AddHeaderCell(table, currentCulture == "ar" ? "تاريخ الإنشاء" : "Created Date", baseFont);
-            AddHeaderCell(table, currentCulture == "ar" ? "العنوان" : "Address", baseFont);
+                        void AddLabelValue(string labelAr, string labelEn, string value)
+                        {
+                            string label = isArabic ? labelAr : labelEn;
+                            string finalValue = value ?? (isArabic ? "غير متوفر" : "N/A");
 
-            string description = currentCulture == "ar" ? (report.DescriptionAr ?? "N/A") : (report.Description ?? "N/A");
-            string incidentName = currentCulture == "ar" ? (report.Incident?.NameAr ?? "N/A") : (report.Incident?.NameEn ?? "N/A");
-            string incidentTypeName = currentCulture == "ar" ? (incidentType?.NameAr ?? "N/A") : (incidentType?.NameEn ?? "N/A");
-            string address = report.Address ?? "N/A";
+                            col.Item().PaddingVertical(5).Row(row =>
+                            {
+                                row.Spacing(10);
 
-            AddCell(table, description, baseFont);
-            AddCell(table, incidentName, baseFont);
-            AddCell(table, incidentTypeName, baseFont);
-            AddCell(table, report.CreatedDate.ToString("yyyy-MM-dd HH:mm"), baseFont);
-            AddCell(table, address, baseFont);
+                                if (isArabic)
+                                {
+                                    row.RelativeItem().AlignRight().Text(text =>
+                                    {
+                                        text.Span(label).Bold().FontSize(14);
+                                        text.Span("   ");
+                                        text.Span(finalValue).FontSize(14);
+                                    });
+                                }
+                                else
+                                {
+                                    row.RelativeItem().AlignLeft().Text(text =>
+                                    {
+                                        text.Span(label).Bold().FontSize(14);
+                                        text.Span("   ");
+                                        text.Span(finalValue).FontSize(14);
+                                    });
+                                }
+                            });
+                        }
 
-            document.Add(table);
-            document.Close();
+                    
+                        AddLabelValue("الوصف:", "Description:", isArabic ? report.DescriptionAr : report.Description);
+                        AddLabelValue("رقم الهاتف:", "Phone Number:", report.PhoneNumber);
+                        AddLabelValue("العنوان:", "Address:", report.Address);
+                        AddLabelValue("تاريخ الإنشاء:", "Created On:", report.CreatedDate.ToLocalTime().ToString("f"));
+                       
 
-            return memoryStream.ToArray();
-        }
+                        
+                        if (!string.IsNullOrEmpty(report.ImagePath))
+                        {
+                            string imagePath = Path.Combine(Environment.CurrentDirectory, "wwwroot", report.ImagePath.Replace("/", "\\"));
+                            if (File.Exists(imagePath))
+                            {
+                                col.Item().PaddingTop(20).AlignCenter().Element(container =>
+                                {
+                                    container.Height(400)
+                                             .Image(imagePath)
+                                             .FitArea();
+                                });
+                            }
+                            else
+                            {
+                                col.Item().PaddingTop(20).AlignCenter().Text(isArabic ? "الصورة غير متوفرة" : "Image not available")
+                                   .FontSize(14)
+                                   .Italic();
+                            }
+                        }
+                    });
+                });
+            }).GeneratePdf(stream);
 
-        private static void AddHeaderCell(PdfPTable table, string text, BaseFont baseFont)
-        {
-            var font = new Font(baseFont, 12, Font.BOLD, BaseColor.White);
-            var cell = new PdfPCell(new Phrase(text, font))
-            {
-                BackgroundColor = new BaseColor(0, 102, 204),
-                HorizontalAlignment = Element.ALIGN_CENTER,
-                Padding = 8
-            };
-            table.AddCell(cell);
-        }
-
-        private static void AddCell(PdfPTable table, string text, BaseFont baseFont)
-        {
-            var font = new Font(baseFont, 11);
-            var cell = new PdfPCell(new Phrase(text, font))
-            {
-                Padding = 6
-            };
-            table.AddCell(cell);
+            return stream.ToArray();
         }
     }
+
+
+
 }

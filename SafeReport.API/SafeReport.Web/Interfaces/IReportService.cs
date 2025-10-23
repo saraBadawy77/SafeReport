@@ -8,4 +8,6 @@ public interface IReportService
     Task<bool> DeleteReportAsync(Guid id);
     Task<bool> PrintReportAsync(Guid id);
     Task<List<Response<IncidentType>>> GetAllIncidentsAsync();
+    Task<Response<ReportDTO>> ShowReportDetails(Guid reportId);
+  
 }

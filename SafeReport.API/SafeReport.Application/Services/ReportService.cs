@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using SafeReport.Application.Common;
 using SafeReport.Application.DTOs;
@@ -20,18 +21,21 @@ namespace SafeReport.Application.Services
         private readonly IMapper _mapper;
         private readonly IHubContext<ReportHub> _hubContext;
         private readonly IWebHostEnvironment _env;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         public ReportService(
             IReportRepository reportRepository,
             IIncidentTypeRepository incidentTypeRepository,
             IMapper mapper,
             IHubContext<ReportHub> hubContext,
-            IWebHostEnvironment env)
+            IWebHostEnvironment env,
+            IHttpContextAccessor httpContextAccessor)
         {
             _reportRepository = reportRepository;
             _incidentTypeRepository = incidentTypeRepository;
             _mapper = mapper;
             _hubContext = hubContext;
             _env = env;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<Response<PagedResultDto>> GetPaginatedReportsAsync(ReportFilterDto? filter)
@@ -156,6 +160,7 @@ namespace SafeReport.Application.Services
             var incidentType = await _incidentTypeRepository.FindAsync(t => t.Id == report.IncidentTypeId && t.IncidentId == report.IncidentId);
             if (report == null)
                 return null;
+           
             return PrintService.GenerateReportPdf(report, incidentType);
         }
         public async Task<Response<string>> AddReportAsync(CreateReportDto reportDto)
@@ -165,7 +170,8 @@ namespace SafeReport.Application.Services
                 var report = _mapper.Map<Report>(reportDto);
 
                 // Get address from coordinates
-                // report.Address = await GetAddressFromCoordinatesAsync(reportDto.Latitude, reportDto.Longitude);
+                 report.Address = await GetAddressFromCoordinatesAsync(reportDto.Latitude, reportDto.Longitude);
+               // report.Address = "El Tahrir Square, Qasr Al Doubara, Bab al Luq, Cairo, 11519, Egypt";  // for test 
 
                 if (reportDto.Image != null)
                 {
@@ -230,6 +236,69 @@ namespace SafeReport.Application.Services
             {
                 return $"Error adding report: {ex.Message}";
             }
+        }
+        public async Task<Response<ReportDto>> GetReportByIdAsync(Guid id)
+        {
+            try
+            {
+                Expression<Func<Report, object>>[] includes =
+                   { r => r.Incident };
+                var report = await _reportRepository.FindAsync(r => r.Id == id , includes);
+
+                if (report == null)
+                    return Response<ReportDto>.FailResponse("Report not found.");
+
+                // Get related incident type info
+                var incidentType = await _incidentTypeRepository.FindAsync(
+                    t => t.Id == report.IncidentTypeId);
+
+                var currentCulture = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+
+                // Build localized fields
+                string? description = currentCulture == "ar"
+                    ? report.DescriptionAr ?? report.Description
+                    : report.Description ?? report.DescriptionAr;
+
+                string? incidentName = currentCulture == "ar"
+                    ? report.Incident?.NameAr ?? report.Incident?.NameEn
+                    : report.Incident?.NameEn ?? report.Incident?.NameAr;
+
+                string? incidentTypeName = currentCulture == "ar"
+                    ? incidentType?.NameAr ?? incidentType?.NameEn
+                    : incidentType?.NameEn ?? incidentType?.NameAr;
+
+                // Map to DTO
+                var reportDto = new ReportDto
+                {
+                    Id = report.Id,
+                    Description = description ?? "N/A",
+                    CreatedDate = report.CreatedDate,
+                    IncidentId = report.IncidentId,
+                    IncidentName = incidentName ?? "N/A",
+                    IncidentTypeId = report.IncidentTypeId,
+                    IncidentTypeName = incidentTypeName ?? "N/A",
+                    Address = report.Address ?? "N/A",
+                    Image = ImageUrl.GetFullImageUrl(report.ImagePath, _httpContextAccessor),
+                    PhoneNumber = report.PhoneNumber,
+                    TimeSinceCreated = GetTimeSinceCreated(report.CreatedDate)
+                };
+
+                return Response<ReportDto>.SuccessResponse(reportDto, "Fetched report successfully.");
+            }
+            catch (Exception ex)
+            {
+                return Response<ReportDto>.FailResponse($"Error fetching report: {ex.Message}");
+            }
+        }
+
+        private string GetTimeSinceCreated(DateTime createdDate)
+        {
+            var diff = DateTime.UtcNow - createdDate;
+            if (diff.TotalMinutes < 60)
+                return $"{Math.Floor(diff.TotalMinutes)} minutes ago";
+            if (diff.TotalHours < 24)
+                return $"{Math.Floor(diff.TotalHours)} hours ago";
+            return $"{Math.Floor(diff.TotalDays)} days ago";
         }
 
 

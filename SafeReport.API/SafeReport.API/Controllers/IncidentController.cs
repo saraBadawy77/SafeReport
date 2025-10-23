@@ -18,14 +18,14 @@ namespace SafeReport.API.Controllers
 		}
 
 		[HttpGet]
-		public async Task<ActionResult<Response<IEnumerable<IncidentDto>>>> GetAll([FromQuery] PaginationFilter filter)
+		public async Task<ActionResult<Response<IEnumerable<IncidentDto>>>> GetAll()
 		{
-			var response = await _incidentService.GetAllAsync(filter);
+			var response = await _incidentService.GetAllAsync();
 			return Ok(response);
 		}
 
-		[HttpGet("{incidentId}")]
-		public async Task<ActionResult<Response<List<IncidentTypeDto?>>>> GetIncidentType(int incidentId)
+		[HttpGet("GetIncidentProperty{incidentId}")]
+		public async Task<ActionResult<Response<List<IncidentTypeDto?>>>> GetIncidentProperty(int incidentId)
 		{
 			var response = await _incidentService.GetIncidentType(incidentId);
 			if (!response.Success)

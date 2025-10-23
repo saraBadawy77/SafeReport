@@ -54,10 +54,13 @@ else
                     <td>@report.Description</td>
                     <td>@report.CreatedDate.ToString("yyyy-MM-dd HH:mm")</td>
                     <td>
-                        <button class="btn btn-sm btn-primary me-2" @onclick="() => PrintReport(report.Id)">
+                        <button class="btn btn-sm btn-info me-1" @onclick="() => ShowDetails(report.Id)">
+                            <i class="bi bi-info-circle"></i> Details
+                        </button>
+                        <button class="btn btn-sm btn-primary me-1" @onclick="() => PrintReport(report.Id)">
                             <i class="bi bi-printer"></i> Print
                         </button>
-                        <button class="btn btn-sm btn-danger" @onclick="() => DeleteReport(report.Id)">
+                        <button class="btn btn-sm btn-danger  me-1" @onclick="() => DeleteReport(report.Id)">
                             <i class="bi bi-trash"></i> Delete
                         </button>
                     </td>

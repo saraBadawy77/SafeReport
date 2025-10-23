@@ -21,6 +21,8 @@ public partial class Reports
     [Inject]
     private ReportService ReportService { get; set; } = default!;
 
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
     protected override async Task OnInitializedAsync()
     {
         var typesData = await ReportService.GetAllIncidentsAsync();
@@ -122,6 +124,11 @@ public partial class Reports
             await JS.InvokeVoidAsync("alert", "Failed to delete the report ❌");
         }
     }
+    private void ShowDetails(Guid reportId)
+    {
+        NavigationManager.NavigateTo($"/reportdetails/{reportId}");
+    }
+
 
 
 }

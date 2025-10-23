@@ -12,11 +12,11 @@ public class IncidentService(IIncidentRepository incidentRepository, IIncidentTy
     private readonly IIncidentTypeRepository _incidentTypeRepository = incidentTypeRepository;
     private readonly IMapper _mapper = mapper;
 
-    public async Task<Response<IEnumerable<IncidentDto>>> GetAllAsync(PaginationFilter filter)
+    public async Task<Response<IEnumerable<IncidentDto>>> GetAllAsync()
     {
         try
         {
-            var items = await _incidentRepository.GetPagedAsync(filter.PageNumber, filter.PageSize);
+            var items = await _incidentRepository.GetAllAsync();
             var currentCulture = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
             var result = items.Select(item => new IncidentDto
             {
