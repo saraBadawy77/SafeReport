@@ -9,5 +9,7 @@ public interface IReportService
     Task<bool> PrintReportAsync(Guid id);
     Task<List<Response<IncidentType>>> GetAllIncidentsAsync();
     Task<Response<ReportDTO>> ShowReportDetails(Guid reportId);
-  
+    Task<int> GetNewReportsCountAsync(DateTime lastVisitUtc);
+
+
 }

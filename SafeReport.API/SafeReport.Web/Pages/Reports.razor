@@ -5,13 +5,18 @@
 <PageTitle>Reports</PageTitle>
 
 <h3 class="mb-4">Reports List</h3>
-
 <div class="row mb-3">
     <div class="col-md-3">
-        <input type="date" class="form-control" @bind="filterDate" />
+        <input type="date" class="form-control"
+               @bind="filterDate"
+               @bind:event="oninput"
+               @onchange="OnFilterChanged" />
     </div>
     <div class="col-md-3">
-        <select class="form-select" @bind="filterType">
+        <select class="form-select"
+                @bind="filterType"
+                @bind:event="oninput"
+                @onchange="OnFilterChanged">
             <option value="">All Types</option>
             @if (reportTypes != null && reportTypes.Any())
             {
@@ -23,7 +28,6 @@
         </select>
     </div>
     <div class="col-md-3">
-        <button class="btn btn-primary" @onclick="ApplyFilters">Filter</button>
         <button class="btn btn-secondary ms-2" @onclick="ResetFilters">Reset</button>
     </div>
 </div>

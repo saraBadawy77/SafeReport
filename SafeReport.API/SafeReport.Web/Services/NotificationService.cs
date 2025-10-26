@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using SafeReport.Web.DTOs;
+
 namespace SafeReport.Web.Services
 {
     public class NotificationService
     {
         private HubConnection? _hubConnection;
         public event Action<ReportDTO>? OnNewReport;
+
         public async Task StartAsync()
         {
             _hubConnection = new HubConnectionBuilder()
@@ -24,9 +26,8 @@ namespace SafeReport.Web.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($" SignalR connection failed: {ex.Message}");
+                Console.WriteLine($"SignalR connection failed: {ex.Message}");
             }
         }
-
     }
 }

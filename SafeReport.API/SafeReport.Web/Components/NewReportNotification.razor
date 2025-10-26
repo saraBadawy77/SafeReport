@@ -2,6 +2,7 @@
 @using SafeReport.Web.Services
 @inject NotificationService NotificationService
 @inject IJSRuntime JS
+@inject ReportService ReportService
 
 <div class="position-relative m-2">
     <i class="bi bi-bell-fill"></i>
@@ -16,22 +17,29 @@
     {
         NotificationService.OnNewReport += HandleNewReport;
         await NotificationService.StartAsync();
+
+        var lastVisitStr = await JS.InvokeAsync<string>("localStorage.getItem", "LastVisit");
+        DateTime lastVisitUtc = string.IsNullOrEmpty(lastVisitStr)
+            ? DateTime.UtcNow
+            : DateTime.Parse(lastVisitStr);
+
+        // استدعاء أولي للحصول على عدد التقارير الجديدة
+        int initialCount = await ReportService.GetNewReportsCountAsync(lastVisitUtc);
+        if (initialCount > 0)
+        {
+            ShowTemporaryCount(initialCount);
+        }
+
+        await JS.InvokeVoidAsync("localStorage.setItem", "LastVisit", DateTime.UtcNow.ToString("o"));
     }
 
     private void HandleNewReport(ReportDTO report)
     {
         newReportsCount++;
-
-        // Show native browser alert
-        _ = JS.InvokeVoidAsync("alert", "📢 New report received!");
-
         InvokeAsync(StateHasChanged);
 
-        // Cancel any existing timer
         _resetToken?.Cancel();
         _resetToken = new CancellationTokenSource();
-
-        // Reset count after 1 minute
         _ = Task.Run(async () =>
         {
             try
@@ -42,7 +50,29 @@
             }
             catch (TaskCanceledException)
             {
-                // Another report arrived before 1 minute — skip reset
+
+            }
+        });
+    }
+
+    private void ShowTemporaryCount(int count)
+    {
+        newReportsCount = count;
+        InvokeAsync(StateHasChanged);
+
+        _resetToken?.Cancel(); // إلغاء أي مؤقت سابق
+        _resetToken = new CancellationTokenSource();
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(TimeSpan.FromMinutes(1), _resetToken.Token);
+                newReportsCount = 0;
+                await InvokeAsync(StateHasChanged);
+            }
+            catch (TaskCanceledException)
+            {
+                // تم الإلغاء
             }
         });
     }
