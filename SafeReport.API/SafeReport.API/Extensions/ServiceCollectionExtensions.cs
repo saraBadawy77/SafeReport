@@ -27,6 +27,7 @@ namespace SafeReport.API.Extensions
         {
             services.AddScoped<IIncidentService, IncidentService>();
             services.AddScoped<IReportService, ReportService>();
+            services.AddScoped<IIdentityService, IdentityService>();
             return services;
         }
     }
