@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SafeReport.Application.Common;
 using SafeReport.Application.DTOs;
@@ -8,7 +9,7 @@ namespace SafeReport.API.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class IncidentController : ControllerBase
+    public class IncidentController : ControllerBase
 	{
 		private readonly IIncidentService _incidentService;
 
@@ -41,7 +42,7 @@ namespace SafeReport.API.Controllers
 			if (!response.Success)
 				return BadRequest(response);
 
-			return Ok(response); ;
+			return Ok(response);
 		}
 
 		[HttpPut("{id}")]
