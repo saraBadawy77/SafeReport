@@ -8,7 +8,13 @@ It provides a **modern multilingual interface (Arabic / English)** with dynamic 
 **printing
 **pagination  — all built for scalability and performance.
 
----
+🔐 Authentication & Authorization
+
+SafeReport implements user authentication and role-based authorization:
+Authentication: Users must log in to access the application.
+Authorization: Certain actions (like deleting reports) are restricted to specific roles (e.g., Admin).
+JWT Tokens: Secures API endpoints and ensures that only authenticated users can perform actions.
+Blazor Integration: Frontend pages are protected using [Authorize] and role-based <AuthorizeView> components.
 
 ## 🧩 Requirements
 
