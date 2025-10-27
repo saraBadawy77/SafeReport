@@ -71,7 +71,7 @@ namespace SafeReport.Application.Services
                     predicate,
                     include);
 
-                var totalCount = await _reportRepository.GetTotalCountAsync();
+                var totalCount = await _reportRepository.GetTotalCountAsync(predicate);
                 // Get related incident type info
                 var incidentTypeIds = reports.Select(r => r.IncidentTypeId).Distinct().ToList();
                 var incidentIds = reports.Select(r => r.IncidentId).Distinct().ToList();

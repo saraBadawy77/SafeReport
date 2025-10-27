@@ -12,13 +12,10 @@ builder.Services.AddScoped<ReportService>();
 builder.Services.AddSingleton<NotificationService>();
 // Register HttpClient for WebAssembly
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7196/") });
-
-
 builder.RootComponents.Add<App>("#app");
-builder.Services.AddLocalization(options => options.ResourcesPath = "ResourcesFiles");
 builder.RootComponents.Add<HeadOutlet>("head::after");
-
+builder.Services.AddLocalization();
 var host = builder.Build();
-await host.EnsureDefaultCultureAsync();
+await host.SetDefaultCulture();
 await host.RunAsync();
-//await builder.Build().RunAsync();
+await builder.Build().RunAsync();

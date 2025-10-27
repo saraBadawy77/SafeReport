@@ -4,6 +4,14 @@
 @inject IJSRuntime JS
 @inject ReportService ReportService
 
+        @inject NavigationManager NavigationManager ;
+
+@* @using SafeReport.Web.DTOs
+@using SafeReport.Web.Services
+@inject NotificationService NotificationService
+@inject IJSRuntime JS
+@inject ReportService ReportService
+
 <div class="position-relative m-2">
     <i class="bi bi-bell-fill"></i>
     <span class="badge bg-danger">@newReportsCount</span>
@@ -23,7 +31,6 @@
             ? DateTime.UtcNow
             : DateTime.Parse(lastVisitStr);
 
-        // استدعاء أولي للحصول على عدد التقارير الجديدة
         int initialCount = await ReportService.GetNewReportsCountAsync(lastVisitUtc);
         if (initialCount > 0)
         {
@@ -60,7 +67,7 @@
         newReportsCount = count;
         InvokeAsync(StateHasChanged);
 
-        _resetToken?.Cancel(); // إلغاء أي مؤقت سابق
+        _resetToken?.Cancel(); 
         _resetToken = new CancellationTokenSource();
         _ = Task.Run(async () =>
         {
@@ -72,8 +79,116 @@
             }
             catch (TaskCanceledException)
             {
-                // تم الإلغاء
+               
             }
         });
     }
 }
+ *@
+
+
+<div class="position-relative m-3">
+    <div class="notification-icon" @onclick="ToggleDropdown">
+        <i class="bi bi-bell-fill"></i>
+
+            <span class="badge bg-danger">@newReportsCount</span>
+        
+    </div>
+
+    @if (showDropdown && newReportsCount > 0)
+    {
+        <div class="dropdown-menu show dropdown-alert">
+            @foreach (var report in newReports)
+            {
+                <div class="dropdown-item d-flex justify-content-between align-items-center">
+                    <span>@report.IncidentTypeName</span>
+                    <button class="btn btn-sm btn-primary" @onclick="() => NavigateToReport(report.Id)">View</button>
+                </div>
+                <div class="dropdown-divider"></div>
+            }
+            <div class="text-center p-1">
+                <button class="btn btn-outline-secondary btn-sm"X
+                        @onclick="ClearNotifications">
+                </button>
+            </div>
+        </div>
+    }
+</div>
+<style>
+    .notification-icon {
+        cursor: pointer;
+        position: relative;
+    }
+
+    .dropdown-alert {
+        position: absolute;
+        top: 30px;
+        left: 1px;
+        width: 250px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+    }
+
+    .dropdown-item {
+        cursor: pointer;
+    }
+
+    .badge {
+        position: absolute;
+        top: -5px;
+        right: -10px;
+    }
+
+</style>
+@code {
+    private int newReportsCount = 10;
+    private bool showDropdown = false;
+    private List<ReportDTO> newReports = new();
+    private CancellationTokenSource? _resetToken;
+
+    protected override async Task OnInitializedAsync()
+    {
+        newReportsCount = 3;
+        newReports.Add(new ReportDTO
+        {
+            Id = new Guid("fef32c70-ac0d-4be7-057a-08de117dcc81"),
+            IncidentTypeName = "🔥 Test Incident"
+        });
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+
+    private void HandleNewReport(ReportDTO report)
+    {
+        newReports.Add(report);
+        newReportsCount++;
+
+        showDropdown = true; 
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void ToggleDropdown()
+    {
+        showDropdown = !showDropdown;
+    }
+
+    private void NavigateToReport(Guid id)
+    {
+        newReports.RemoveAll(x => x.Id == id);
+        newReportsCount = newReports.Count;
+        showDropdown = false;
+
+        NavigationManager.NavigateTo($"/reportdetails/{id}");
+    }
+
+    private void ClearNotifications()
+    {
+        newReports.Clear();
+        newReportsCount = 0;
+        showDropdown = false;
+    }
+}
+

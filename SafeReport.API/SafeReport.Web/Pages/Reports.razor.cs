@@ -8,7 +8,9 @@ namespace SafeReport.Web.Pages;
 public partial class Reports
 {
     private List<ReportDTO> pagedReports = new();
-    private List<IncidentType> reportTypes = new();
+    private List<Incident> reportTypes = new();
+    private List<IncidentTypeDto> incidentTypes=new();
+    public int? incidentTypeId;
     [Inject]
     Microsoft.JSInterop.IJSRuntime JS { get; set; }
     private int? filterType;
@@ -28,6 +30,9 @@ public partial class Reports
         var typesData = await ReportService.GetAllIncidentsAsync();
         reportTypes = typesData.Select(r => r.Data!).ToList();
 
+        var incidentTypeData = await ReportService.GetAllIncidentTypeAsync();
+        incidentTypes = incidentTypeData.Data;
+
         await LoadReportsAsync();
     }
 
@@ -38,6 +43,7 @@ public partial class Reports
             IncidentId = filterType,
             CreatedDate = filterDate,
             PageNumber = currentPage,
+            IncidentTypeId = incidentTypeId,
             PageSize = pageSize
         };
 
@@ -53,16 +59,18 @@ public partial class Reports
             totalPages = 1;
         }
     }
-
     private async Task ResetFilters()
     {
         filterType = null;
         filterDate = null;
+        incidentTypeId = null;
         currentPage = 1;
+
+        var allTypes = await ReportService.GetAllIncidentTypeAsync();
+        incidentTypes = allTypes.Data ?? new List<IncidentTypeDto>();
+
         await LoadReportsAsync();
     }
-
-
 
     private async Task PrevPage()
     {
@@ -99,14 +107,51 @@ public partial class Reports
             await JS.InvokeVoidAsync("alert", "Failed to open PDF report.");
         }
     }
-
-    private async Task OnFilterChanged(ChangeEventArgs e)
+    private async Task OnIncidentTypeChanged(ChangeEventArgs e)
     {
+        incidentTypeId = int.TryParse(e.Value?.ToString(), out var val) ? val : null;
+
+        filterDate = null;
         currentPage = 1;
+
+        await LoadReportsAsync();
+    }
+    private async Task OnIncidentChanged(ChangeEventArgs e)
+    {
+        filterType = int.TryParse(e.Value?.ToString(), out var val) ? val : null;
+
+        incidentTypeId = null;
+        filterDate = null;
+        currentPage = 1;
+
+        if (filterType.HasValue)
+        {
+            var typesRes = await ReportService.GetIncidentTypesByIncidentIdAsync(filterType.Value);
+
+            if (typesRes.Success && typesRes.Data != null)
+                incidentTypes = typesRes.Data;
+            else
+                incidentTypes = new List<IncidentTypeDto>();
+        }
+        else
+        {
+            var allTypes = await ReportService.GetAllIncidentTypeAsync();
+            incidentTypes = allTypes.Data ?? new List<IncidentTypeDto>();
+        }
+
         await LoadReportsAsync();
     }
 
+    private async Task OnDateChanged(ChangeEventArgs e)
+    {
+        filterDate = DateTime.TryParse(e.Value?.ToString(), out var val) ? val : null;
 
+        incidentTypeId = null;
+        filterType = null;
+        currentPage = 1;
+
+        await LoadReportsAsync();
+    }
     private async Task DeleteReport(Guid id)
     {
         bool confirm = await JS.InvokeAsync<bool>("confirm", "Are you sure you want to delete this report?");

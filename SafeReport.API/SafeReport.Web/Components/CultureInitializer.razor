@@ -2,9 +2,9 @@
 <div class="form-group d-flex align-items-center gap-2">
     <label for="cultureSelect" class="mb-0">Language:</label>
     <select id="cultureSelect" class="form-control" style="width: auto;" @bind="_culture">
-        @foreach (var culture in SupportedCultures)
+        @foreach (var culture in cultures)
         {
-            <option value="@culture.Name">@culture.DisplayName</option>
+            <option value="@culture">@culture.DisplayName</option>
         }
     </select>
 </div>

@@ -7,9 +7,13 @@ public interface IReportService
     Task<Response<PagedResultDto>> GetAllReportsAsync(ReportFilterDto filter);
     Task<bool> DeleteReportAsync(Guid id);
     Task<bool> PrintReportAsync(Guid id);
-    Task<List<Response<IncidentType>>> GetAllIncidentsAsync();
+    Task<List<Response<Incident>>> GetAllIncidentsAsync();
     Task<Response<ReportDTO>> ShowReportDetails(Guid reportId);
     Task<int> GetNewReportsCountAsync(DateTime lastVisitUtc);
+    Task<Response<List<IncidentTypeDto>>> GetAllIncidentTypeAsync();
+    Task<Response<List<IncidentTypeDto>>> GetIncidentTypesByIncidentIdAsync(int incidentId);
+
+
 
 
 }

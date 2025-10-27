@@ -29,8 +29,8 @@
     <script src="_framework/blazor.webassembly.js"></script>
     <script>
         window.blazorCulture = {
-            get: () => localStorage.getItem('BlazorCulture'),
-            set: (value) => localStorage.setItem('BlazorCulture', value)
+            get: () => localStorage["BlazorCulture"],
+            set: (value) => localStorage["BlazorCulture"] = value
         };
 
         window.pdfHelper = {

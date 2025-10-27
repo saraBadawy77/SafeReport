@@ -50,7 +50,7 @@ public class ReportService : IReportService
         }
 
     }
-    public async Task<List<Response<IncidentType>>> GetAllIncidentsAsync()
+    public async Task<List<Response<Incident>>> GetAllIncidentsAsync()
     {
         AddCultureHeader();
         try
@@ -59,30 +59,30 @@ public class ReportService : IReportService
 
             if (response != null && response.Data != null)
             {
-                var incidentTypes = response.Data.Select(d => new IncidentType
+                var incidentTypes = response.Data.Select(d => new Incident
                 {
                     Id = d.Id,
                     Name = d.Name
                 });
                 var responseList = incidentTypes
-                    .Select(it => Response<IncidentType>.SuccessResponse(it))
+                    .Select(it => Response<Incident>.SuccessResponse(it))
                     .ToList();
 
                 return responseList;
             }
 
-            return new List<Response<IncidentType>>
+            return new List<Response<Incident>>
             {
-               Response<IncidentType>.SuccessResponse(null, "No incidents found")
+               Response<Incident>.SuccessResponse(null, "No incidents found")
             };
 
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error fetching incidents: {ex.Message}");
-            return new List<Response<IncidentType>>
+            return new List<Response<Incident>>
                 {
-                    Response<IncidentType>.FailResponse("Failed to fetch incidents.")
+                    Response<Incident>.FailResponse("Failed to fetch incidents.")
                 };
         }
     }
@@ -160,6 +160,70 @@ public class ReportService : IReportService
         var response = await _httpClient.GetFromJsonAsync<Response<int>>(url);
         return response?.Data ?? 0;
     }
+    public async Task<Response<List<IncidentTypeDto>>> GetAllIncidentTypeAsync()
+    {
+        AddCultureHeader();
+        try
+        {
+            var httpResponse = await _httpClient.GetAsync("api/IncidentType/GetAllTypes");
+
+            if (!httpResponse.IsSuccessStatusCode)
+            {
+                return Response<List<IncidentTypeDto>>.FailResponse(
+                    $"Request failed: {httpResponse.StatusCode}"
+                );
+            }
+
+            var response = await httpResponse.Content.ReadFromJsonAsync<Response<IEnumerable<IncidentTypeDto>>>();
+
+            if (response != null && response.Data != null)
+            {
+                return Response<List<IncidentTypeDto>>.SuccessResponse(response.Data.ToList());
+            }
+
+            return Response<List<IncidentTypeDto>>.SuccessResponse(null,"No incident types found");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching incidents: {ex.Message}");
+            return Response<List<IncidentTypeDto>>.FailResponse("Failed to fetch incident types");
+        }
+    }
+    public async Task<Response<List<IncidentTypeDto>>> GetIncidentTypesByIncidentIdAsync(int incidentId)
+    {
+        AddCultureHeader();
+        try
+        {
+            var httpResponse = await _httpClient.GetAsync($"api/IncidentType/GetByIncidentId{incidentId}");
+
+            if (!httpResponse.IsSuccessStatusCode)
+            {
+                return Response<List<IncidentTypeDto>>.FailResponse(
+                    $"Request failed: {httpResponse.StatusCode}"
+                );
+            }
+
+            var response = await httpResponse.Content.ReadFromJsonAsync<Response<IEnumerable<IncidentTypeDto>>>();
+
+            if (response != null && response.Data != null)
+            {
+                return Response<List<IncidentTypeDto>>.SuccessResponse(
+                    response.Data.ToList(),
+                    response.Message
+                );
+            }
+
+            return Response<List<IncidentTypeDto>>.SuccessResponse(null,"No incident types found");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching incident types by incidentId: {ex.Message}");
+            return Response<List<IncidentTypeDto>>.FailResponse("Failed to fetch data");
+        }
+    }
+
+
+
 
 
 

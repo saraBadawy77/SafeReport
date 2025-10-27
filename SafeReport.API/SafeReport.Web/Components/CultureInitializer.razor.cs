@@ -6,33 +6,33 @@ namespace SafeReport.Web.Components
 {
     public partial class CultureInitializer
     {
-        [Inject]
-        public IJSRuntime _JSRuntime { get; set; }
-        [Inject]
-        public NavigationManager _NavigationManager { get; set; }
 
-        CultureInfo[] SupportedCultures =
+        [Inject]
+        public NavigationManager _navigationManager { get; set; }
+        [Inject]
+        public IJSRuntime _jSRuntime { get; set; }
+
+        CultureInfo[] cultures = new[]
         {
-        new("ar-EG"),
-        new("en-US")
+            new CultureInfo("en-US"),
+            new CultureInfo("ar-EG")
         };
 
-        public CultureInfo _culture {
+        public CultureInfo _culture
+        {
             get => CultureInfo.CurrentCulture;
-        
+
             set
             {
-                if (CultureInfo.CurrentCulture!=value)
+                if (CultureInfo.CurrentCulture != value)
                 {
-                    var js = (IJSInProcessRuntime)_JSRuntime;
+                    var js = (IJSInProcessRuntime)_jSRuntime;
                     js.InvokeVoid("blazorCulture.set", value.Name);
-                    _NavigationManager.NavigateTo(_NavigationManager.Uri, forceLoad: true);
-
+                    _navigationManager.NavigateTo(_navigationManager.Uri, forceLoad: true);
                 }
-
-
             }
-        
+
+
         }
 
 

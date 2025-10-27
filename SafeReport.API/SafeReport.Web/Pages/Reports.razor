@@ -3,33 +3,50 @@
 @using SafeReport.Web.Services
 
 <PageTitle>Reports</PageTitle>
-
 <h3 class="mb-4">Reports List</h3>
 <div class="row mb-3">
+
     <div class="col-md-3">
+        <label class="form-label">Date</label>
         <input type="date" class="form-control"
                @bind="filterDate"
                @bind:event="oninput"
-               @onchange="OnFilterChanged" />
+               @onchange="@(e => OnDateChanged(e))" />
     </div>
+
     <div class="col-md-3">
+        <label class="form-label">Incident Type</label>
         <select class="form-select"
-                @bind="filterType"
+                @bind="incidentTypeId"
                 @bind:event="oninput"
-                @onchange="OnFilterChanged">
-            <option value="">All Types</option>
-            @if (reportTypes != null && reportTypes.Any())
+                @onchange="@(e => OnIncidentTypeChanged(e))"
+                disabled="@(!filterType.HasValue)">
+            <option value="">Incident Types</option>
+            @foreach (var type in incidentTypes)
             {
-                @foreach (var item in reportTypes)
-                {
-                    <option value="@item.Id">@item.Name</option>
-                }
+                <option value="@type.Id">@type.Name</option>
             }
         </select>
     </div>
+
+    <div class="col-md-3">
+        <label class="form-label">Incident</label>
+        <select class="form-select"
+                @bind="filterType"
+                @bind:event="oninput"
+                @onchange="@(e => OnIncidentChanged(e))">
+            <option value="">Incidents</option>
+            @foreach (var item in reportTypes)
+            {
+                <option value="@item.Id">@item.Name</option>
+            }
+        </select>
+    </div>
+
     <div class="col-md-3">
         <button class="btn btn-secondary ms-2" @onclick="ResetFilters">Reset</button>
     </div>
+
 </div>
 
 
@@ -42,8 +59,8 @@ else
     <table class="table table-striped">
         <thead class="table-dark">
             <tr>
+                <th>Incident</th>
                 <th>Incident Type</th>
-                <th>Incident Name</th>
                 <th>Description</th>
                 <th>Created Date</th>
                 <th>Actions</th>
@@ -53,8 +70,8 @@ else
             @foreach (var report in pagedReports)
             {
                 <tr>
-                    <td>@report.IncidentTypeName</td>
                     <td>@report.IncidentName</td>
+                    <td>@report.IncidentTypeName</td>
                     <td>@report.Description</td>
                     <td>@report.CreatedDate.ToString("yyyy-MM-dd HH:mm")</td>
                     <td>

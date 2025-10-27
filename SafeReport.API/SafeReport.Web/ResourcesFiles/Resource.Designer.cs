@@ -61,11 +61,20 @@ namespace SafeReport.Web.ResourcesFiles {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to test home .
+        ///   Looks up a localized string similar to Home test .
         /// </summary>
         public static string Home {
             get {
                 return ResourceManager.GetString("Home", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reports  test .
+        /// </summary>
+        public static string Reports {
+            get {
+                return ResourceManager.GetString("Reports", resourceCulture);
             }
         }
     }
