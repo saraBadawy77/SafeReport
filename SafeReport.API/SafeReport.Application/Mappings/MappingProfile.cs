@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using SafeReport.Application.DTOs;
 using SafeReport.Core.Models;
+using System.Globalization;
 
 
 namespace SafeReport.Application.Mappings
@@ -21,6 +22,13 @@ namespace SafeReport.Application.Mappings
                 .ForMember(dest => dest.ImagePath, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedDate, opt => opt.MapFrom(src => DateTime.UtcNow))
                 .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => false));
+            CreateMap<IncidentType, IncidentTypeDto>()
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src =>
+                CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? src.NameAr : src.NameEn))
+            .ForMember(dest => dest.Description, opt => opt.MapFrom(src =>
+                CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? src.DescriptionAr : src.DescriptionEn))
+            .ForMember(dest => dest.Creationdate, opt => opt.MapFrom(src => src.CreationDate)).ReverseMap();
+            CreateMap<CreateIncidentTypeDto, IncidentType>();
         }
     }
 

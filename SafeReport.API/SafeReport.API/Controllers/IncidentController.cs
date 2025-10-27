@@ -25,16 +25,6 @@ namespace SafeReport.API.Controllers
 			return Ok(response);
 		}
 
-		[HttpGet("GetIncidentProperty{incidentId}")]
-		public async Task<ActionResult<Response<List<IncidentTypeDto?>>>> GetIncidentProperty(int incidentId)
-		{
-			var response = await _incidentService.GetIncidentType(incidentId);
-			if (!response.Success)
-				return NotFound(response);
-
-			return Ok(response);
-		}
-
 		[HttpPost]
 		public async Task<ActionResult<Response<IncidentDto>>> Create([FromBody] CreateIncidentDto dto)
 		{

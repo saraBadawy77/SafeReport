@@ -26,6 +26,7 @@ namespace SafeReport.API.Extensions
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
             services.AddScoped<IIncidentService, IncidentService>();
+            services.AddScoped<IIncidentTypeService, IncidentTypeService>();
             services.AddScoped<IReportService, ReportService>();
             services.AddScoped<IIdentityService, IdentityService>();
             return services;
