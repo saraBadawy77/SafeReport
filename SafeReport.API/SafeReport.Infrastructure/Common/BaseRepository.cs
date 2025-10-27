@@ -127,6 +127,28 @@ namespace SafeReport.Infrastructure.Common
 
             return await query.CountAsync();
         }
+        public async Task<IEnumerable<T>> FindAllIncludes(
+     Expression<Func<T, bool>> predicate,
+     params Expression<Func<T, object>>[]? includes)
+        {
+            IQueryable<T> query = _dbSet.Where(predicate);
+
+            if (typeof(ISoftDelete).IsAssignableFrom(typeof(T)))
+            {
+                query = query.Where(e => !((ISoftDelete)e).IsDeleted);
+            }
+
+            if (includes != null)
+            {
+                foreach (var include in includes)
+                {
+                    query = query.Include(include);
+                }
+            }
+
+            return await query.AsNoTracking().ToListAsync();
+        }
+
 
 
 

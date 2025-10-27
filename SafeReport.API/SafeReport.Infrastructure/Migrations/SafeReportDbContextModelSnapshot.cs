@@ -185,7 +185,7 @@ namespace SafeReport.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Incident");
+                    b.ToTable("Incident", (string)null);
                 });
 
             modelBuilder.Entity("SafeReport.Core.Models.IncidentType", b =>
@@ -223,7 +223,7 @@ namespace SafeReport.Infrastructure.Migrations
 
                     b.HasIndex("IncidentId");
 
-                    b.ToTable("IncidentType");
+                    b.ToTable("IncidentType", (string)null);
                 });
 
             modelBuilder.Entity("SafeReport.Core.Models.Report", b =>
@@ -270,7 +270,7 @@ namespace SafeReport.Infrastructure.Migrations
 
                     b.HasIndex("IncidentId");
 
-                    b.ToTable("Report");
+                    b.ToTable("Report", (string)null);
                 });
 
             modelBuilder.Entity("SafeReport.Infrastructure.Identity.ApplicationUser", b =>

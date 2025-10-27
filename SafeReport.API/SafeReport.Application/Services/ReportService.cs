@@ -9,6 +9,7 @@ using SafeReport.Application.Helper;
 using SafeReport.Application.ISevices;
 using SafeReport.Core.Interfaces;
 using SafeReport.Core.Models;
+using SafeReport.Infrastructure.Repositories;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Text.Json;
@@ -19,6 +20,7 @@ namespace SafeReport.Application.Services
     {
         private readonly IReportRepository _reportRepository;
         private readonly IIncidentTypeRepository _incidentTypeRepository;
+        private readonly IIncidentRepository _incidentRepository ;
         private readonly IMapper _mapper;
         private readonly IHubContext<ReportHub> _hubContext;
         private readonly IWebHostEnvironment _env;
@@ -29,7 +31,8 @@ namespace SafeReport.Application.Services
             IMapper mapper,
             IHubContext<ReportHub> hubContext,
             IWebHostEnvironment env,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IIncidentRepository incidentRepository)
         {
             _reportRepository = reportRepository;
             _incidentTypeRepository = incidentTypeRepository;
@@ -37,6 +40,7 @@ namespace SafeReport.Application.Services
             _hubContext = hubContext;
             _env = env;
             _httpContextAccessor = httpContextAccessor;
+            _incidentRepository = incidentRepository;
         }
 
         public async Task<Response<PagedResultDto>> GetPaginatedReportsAsync(ReportFilterDto? filter)
@@ -172,6 +176,12 @@ namespace SafeReport.Application.Services
         {
             try
             {
+                var incidentExists = await _incidentRepository.GetByIdAsync(reportDto.IncidentId);
+                if (incidentExists is null)
+                    return Response<string>.FailResponse("Invalid IncidentId.");
+                var incidentType = await _incidentTypeRepository.GetByIdAsync(reportDto.IncidentTypeId);
+                if (incidentType == null )
+                    return Response<string>.FailResponse("Incident type not found");
                 var report = _mapper.Map<Report>(reportDto);
 
                 // Get address from coordinates
@@ -305,14 +315,17 @@ namespace SafeReport.Application.Services
                 return $"{Math.Floor(diff.TotalHours)} hours ago";
             return $"{Math.Floor(diff.TotalDays)} days ago";
         }
-
-
-        public async Task<int> GetNewReportsCount(DateTime lastVisitUtc)
+        public async Task<Response<List<ReportDto>>> GetNewReports(DateTime lastVisitUtc)
         {
             Expression<Func<Report, bool>> filter = r => r.CreatedDate > lastVisitUtc;
-            var count = await _reportRepository.CountAsync(filter);
-            return count;
+            var reports = await _reportRepository.FindAllIncludes(
+                filter,
+                r => r.Incident
+            );
+            var reportDtos = _mapper.Map<List<ReportDto>>(reports);
+            return Response<List<ReportDto>>.SuccessResponse(reportDtos, $"Found {reportDtos.Count} new reports.");
         }
+
 
 
 

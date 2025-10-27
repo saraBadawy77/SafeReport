@@ -62,12 +62,18 @@ namespace SafeReport.API.Controllers
 
             return File(pdfBytes, "application/pdf", $"Report_{id}.pdf");
         }
-        [HttpGet("GetNewReportsCount")]
-        public async Task<ActionResult<Response<int>>> GetNewReportsCount(DateTime lastVisitUtc)
+        [HttpGet("GetNewReports")]
+        public async Task<ActionResult<Response<List<ReportDto>>>> GetNewReports(DateTime lastVisitUtc)
         {
-            var count = await _reportService.GetNewReportsCount(lastVisitUtc);
-            return Response<int>.SuccessResponse(count);
+            var result = await _reportService.GetNewReports(lastVisitUtc);
+
+            if (!result.Success)
+                return BadRequest(result); 
+
+            return Ok(result);
         }
+
+
 
     }
 }

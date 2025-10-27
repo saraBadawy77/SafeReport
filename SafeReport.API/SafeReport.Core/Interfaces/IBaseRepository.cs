@@ -15,5 +15,6 @@ namespace SafeReport.Application.Interfaces
         Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> predicate);
         Task<T> FindAsync(Expression<Func<T, bool>> predicate, Expression<Func<T, object>>[]? includes = null);
         Task<int> CountAsync(Expression<Func<T, bool>> predicate);
+        Task<IEnumerable<T>> FindAllIncludes(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[]? includes);
     }
 }

@@ -11,6 +11,6 @@ namespace SafeReport.Application.ISevices
         Task<byte[]> GetReportsPdfAsync(Guid id);
         Task<Response<string>> AddReportAsync(CreateReportDto reportDto);
         Task<Response<ReportDto>> GetReportByIdAsync(Guid id);
-        Task<int> GetNewReportsCount(DateTime lastVisitUtc);
+        Task<Response<List<ReportDto>>> GetNewReports(DateTime lastVisitUtc);
     }
 }

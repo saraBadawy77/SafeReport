@@ -5,21 +5,25 @@ using System.IO;
 
 namespace SafeReport.Infrastructure.Context
 {
-    public class SafeReportDbContextFactory : IDesignTimeDbContextFactory<SafeReportDbContext>
-    {
-        public SafeReportDbContext CreateDbContext(string[] args)
+ 
+        public class SafeReportDbContextFactory : IDesignTimeDbContextFactory<SafeReportDbContext>
         {
-            IConfigurationRoot configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false)
-                .Build();
+            public SafeReportDbContext CreateDbContext(string[] args)
+            {
+                var basePath = Directory.GetCurrentDirectory();
+                var builder = new ConfigurationBuilder()
+                    .SetBasePath(basePath)
+                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                    .Build();
 
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
+                var connectionString = builder.GetConnectionString("DefaultConnection")
+                    ?? "Server=.;Database=SafeReportDb;Trusted_Connection=True;MultipleActiveResultSets=true";
 
-            var optionsBuilder = new DbContextOptionsBuilder<SafeReportDbContext>();
-            optionsBuilder.UseSqlServer(connectionString);
+                var optionsBuilder = new DbContextOptionsBuilder<SafeReportDbContext>();
+                optionsBuilder.UseSqlServer(connectionString);
 
-            return new SafeReportDbContext(optionsBuilder.Options);
+                return new SafeReportDbContext(optionsBuilder.Options);
+            }
         }
-    }
+    
 }

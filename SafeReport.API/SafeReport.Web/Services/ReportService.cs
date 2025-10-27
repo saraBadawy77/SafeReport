@@ -123,9 +123,7 @@ public class ReportService : IReportService
                 var base64 = Convert.ToBase64String(pdfBytes);
                 await _jsRuntime.InvokeVoidAsync("pdfHelper.openPdf", base64, $"Report_{id}.pdf");
                 return true;
-            }
-
-            Console.WriteLine($" Failed to print report: {response.ReasonPhrase}");
+            };
             return false;
         }
         catch (Exception ex)
@@ -154,12 +152,28 @@ public class ReportService : IReportService
             return Response<ReportDTO>.FailResponse($"Error fetching report details: {ex.Message}");
         }
     }
-    public async Task<int> GetNewReportsCountAsync(DateTime lastVisitUtc)
+    //public async Task<int> GetNewReportsCountAsync(DateTime lastVisitUtc)
+    //{
+    //    string url = $"api/Report/GetNewReportsCount?lastVisitUtc={Uri.EscapeDataString(lastVisitUtc.ToString("o"))}";
+    //    var response = await _httpClient.GetFromJsonAsync<Response<int>>(url);
+    //    return response?.Data ?? 0;
+    //}
+    public async Task<Response<List<ReportDTO>>> GetNewReportsAsync(DateTime lastVisitUtc)
     {
-        string url = $"api/Report/GetNewReportsCount?lastVisitUtc={Uri.EscapeDataString(lastVisitUtc.ToString("o"))}";
-        var response = await _httpClient.GetFromJsonAsync<Response<int>>(url);
-        return response?.Data ?? 0;
+        string url = $"api/Report/GetNewReports?lastVisitUtc={Uri.EscapeDataString(lastVisitUtc.ToString("o"))}";
+
+        try
+        {
+            var response = await _httpClient.GetFromJsonAsync<Response<List<ReportDTO>>>(url);
+
+            return response ?? Response<List<ReportDTO>>.FailResponse("Failed to fetch new reports.");
+        }
+        catch (HttpRequestException ex)
+        {
+            return Response<List<ReportDTO>>.FailResponse($"Error fetching new reports: {ex.Message}");
+        }
     }
+
     public async Task<Response<List<IncidentTypeDto>>> GetAllIncidentTypeAsync()
     {
         AddCultureHeader();
