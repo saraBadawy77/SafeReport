@@ -116,6 +116,17 @@ namespace SafeReport.Infrastructure.Common
 
             return query.AsNoTracking().FirstOrDefault();
         }
+        public async Task<int> CountAsync(Expression<Func<T, bool>> predicate)
+        {
+            IQueryable<T> query = _dbSet.Where(predicate);
+
+            if (typeof(ISoftDelete).IsAssignableFrom(typeof(T)))
+            {
+                query = query.Where(e => !((ISoftDelete)e).IsDeleted);
+            }
+
+            return await query.CountAsync();
+        }
 
 
 

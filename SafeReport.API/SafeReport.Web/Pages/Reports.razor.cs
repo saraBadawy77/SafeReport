@@ -54,12 +54,6 @@ public partial class Reports
         }
     }
 
-    private async Task ApplyFilters()
-    {
-        currentPage = 1;
-        await LoadReportsAsync();
-    }
-
     private async Task ResetFilters()
     {
         filterType = null;
@@ -106,6 +100,11 @@ public partial class Reports
         }
     }
 
+    private async Task OnFilterChanged(ChangeEventArgs e)
+    {
+        currentPage = 1;
+        await LoadReportsAsync();
+    }
 
 
     private async Task DeleteReport(Guid id)

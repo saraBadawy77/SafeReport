@@ -8,11 +8,9 @@ namespace SafeReport.Application.DTOs
 {
 	public class IncidentTypeDto
 	{
-		public int Id { get; set; }
-		public string NameEn { get; set; }
-		public string NameAr { get; set; }
-		public string? DescriptionEn { get; set; }
-		public string? DescriptionAr { get; set; }
-		public DateTime Creationdate { get; set; }
-	}
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string? Description { get; set; }
+        public DateTime Creationdate { get; set; }
+    }
 }

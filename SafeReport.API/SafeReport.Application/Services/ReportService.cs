@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using SafeReport.Application.Common;
 using SafeReport.Application.DTOs;
@@ -45,9 +46,11 @@ namespace SafeReport.Application.Services
 
                 Expression<Func<Report, bool>> predicate = r => true;
 
-                if (filter.IncidentId.HasValue && filter.CreatedDate.HasValue)
+                if (filter.IncidentId.HasValue && filter.CreatedDate.HasValue && filter.IncidentTypeId.HasValue)
                 {
-                    predicate = r => r.IncidentId == filter.IncidentId.Value && r.CreatedDate.Date == filter.CreatedDate.Value.Date;
+                    predicate = r => r.IncidentId == filter.IncidentId.Value &&
+                                     r.CreatedDate.Date == filter.CreatedDate.Value.Date &&
+                                     r.IncidentTypeId == filter.IncidentTypeId.Value;
                 }
                 else if (filter.IncidentId.HasValue)
                 {
@@ -57,6 +60,8 @@ namespace SafeReport.Application.Services
                 {
                     predicate = r => r.CreatedDate.Date == filter.CreatedDate.Value.Date;
                 }
+                if (filter.IncidentTypeId.HasValue)
+                    predicate = r => r.IncidentTypeId == filter.IncidentTypeId.Value;
 
                 Expression<Func<Report, object>> include = r => r.Incident;
                 // Pass to repository
@@ -160,8 +165,8 @@ namespace SafeReport.Application.Services
             var incidentType = await _incidentTypeRepository.FindAsync(t => t.Id == report.IncidentTypeId && t.IncidentId == report.IncidentId);
             if (report == null)
                 return null;
-           
-            return PrintService.GenerateReportPdf(report, incidentType);
+
+            return PrintService.GenerateReportPdf(report, incidentType, _env);
         }
         public async Task<Response<string>> AddReportAsync(CreateReportDto reportDto)
         {
@@ -170,8 +175,8 @@ namespace SafeReport.Application.Services
                 var report = _mapper.Map<Report>(reportDto);
 
                 // Get address from coordinates
-                 report.Address = await GetAddressFromCoordinatesAsync(reportDto.Latitude, reportDto.Longitude);
-               // report.Address = "El Tahrir Square, Qasr Al Doubara, Bab al Luq, Cairo, 11519, Egypt";  // for test 
+                // report.Address = await GetAddressFromCoordinatesAsync(reportDto.Latitude, reportDto.Longitude);
+                report.Address = "El Tahrir Square, Qasr Al Doubara, Bab al Luq, Cairo, 11519, Egypt";  // for test 
 
                 if (reportDto.Image != null)
                 {
@@ -300,6 +305,18 @@ namespace SafeReport.Application.Services
                 return $"{Math.Floor(diff.TotalHours)} hours ago";
             return $"{Math.Floor(diff.TotalDays)} days ago";
         }
+
+
+        public async Task<int> GetNewReportsCount(DateTime lastVisitUtc)
+        {
+            Expression<Func<Report, bool>> filter = r => r.CreatedDate > lastVisitUtc;
+            var count = await _reportRepository.CountAsync(filter);
+            return count;
+        }
+
+
+
+
 
 
 

@@ -3,12 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using SafeReport.Application.Common;
 using SafeReport.Application.DTOs;
 using SafeReport.Application.ISevices;
+using SafeReport.Core.Models;
+using System.Linq.Expressions;
 
 namespace SafeReport.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-   // [Authorize]
+    // [Authorize]
     public class ReportController(IReportService reportService) : ControllerBase
     {
         private readonly IReportService _reportService = reportService;
@@ -60,5 +62,12 @@ namespace SafeReport.API.Controllers
 
             return File(pdfBytes, "application/pdf", $"Report_{id}.pdf");
         }
+        [HttpGet("GetNewReportsCount")]
+        public async Task<ActionResult<Response<int>>> GetNewReportsCount(DateTime lastVisitUtc)
+        {
+            var count = await _reportService.GetNewReportsCount(lastVisitUtc);
+            return Response<int>.SuccessResponse(count);
+        }
+
     }
 }
