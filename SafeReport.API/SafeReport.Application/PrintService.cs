@@ -18,7 +18,6 @@ namespace SafeReport.Application
 
             var currentCulture = CultureInfo.CurrentCulture.TwoLetterISOLanguageName.ToLower();
             bool isArabic = currentCulture == "ar";
-            isArabic = true;
             // === Fonts ===
             string fontPath = Path.Combine(env.WebRootPath, "fonts", "arial.ttf");
             BaseFont baseFont = BaseFont.CreateFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);

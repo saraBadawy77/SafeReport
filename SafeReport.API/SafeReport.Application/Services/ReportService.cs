@@ -42,7 +42,7 @@ namespace SafeReport.Application.Services
             _httpContextAccessor = httpContextAccessor;
             _incidentRepository = incidentRepository;
         }
-         string currentCulture = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+         
         public async Task<Response<PagedResultDto>> GetPaginatedReportsAsync(ReportFilterDto? filter)
         {
             try
@@ -172,7 +172,8 @@ namespace SafeReport.Application.Services
         {
             Expression<Func<Report, object>>[] includes =
             {
-                r => r.Incident
+                r => r.Incident,
+                r=>r.Images
             };
 
             var report = await _reportRepository.FindAsync(r => r.Id == id, includes);
@@ -238,7 +239,7 @@ namespace SafeReport.Application.Services
                         // Get address from coordinates
              // report.Address = await GetAddressFromCoordinatesAsync(reportDto.Latitude, reportDto.Longitude);
                 report.Address = "El Tahrir Square, Qasr Al Doubara, Bab al Luq, Cairo, 11519, Egypt";  // for test
-
+                string currentCulture = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
                 if (reportDto.Images != null && reportDto.Images.Any())
                 {
                     report.Images = await SaveReportImagesAsync(reportDto.Images);
