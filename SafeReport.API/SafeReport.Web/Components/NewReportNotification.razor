@@ -15,7 +15,7 @@
 
     @if (showDropdown && NotificationState.NewReports.Any())
     {
-        <div class="dropdown-menu show dropdown-alert">
+        <div class="dropdown-menu show dropdown-alert @(isArabic ? "rtl-alert" : "ltr-alert")" >
             @foreach (var report in NotificationState.NewReports)
             {
                 <div class="dropdown-item d-flex justify-content-between align-items-center">
@@ -58,7 +58,6 @@
     .dropdown-alert {
         position: absolute;
         top: 30px;
-        left: 0;
         width: 280px;
         background: white;
         border-radius: 8px;
@@ -69,35 +68,41 @@
     .dropdown-item {
         cursor: pointer;
     }
+
+    .rtl-alert {
+        left: 0; }
+
+    .ltr-alert {
+        right: -19px;
+    }
 </style>
-
 @code {
+    private bool isArabic => CultureInfo.CurrentCulture.Name.StartsWith("ar");
     private bool showDropdown = false;
-
     protected override async Task OnInitializedAsync()
     {
         NotificationState.OnChange += StateHasChanged;
-        await NotificationState.InitializeAsync(); 
+        await NotificationState.InitializeAsync();
 
         NotificationService.OnNewReport += HandleNewReport;
-        await NotificationService.StartAsync();
 
         var lastVisitStr = await JS.InvokeAsync<string>("localStorage.getItem", "LastVisit");
-        if (string.IsNullOrEmpty(lastVisitStr))
+        DateTime lastVisit = DateTime.MinValue;
+        if (!string.IsNullOrEmpty(lastVisitStr))
         {
-            lastVisitStr = DateTime.UtcNow.ToString("o");
-            await JS.InvokeVoidAsync("localStorage.setItem", "LastVisit", lastVisitStr);
+            DateTime.TryParse(lastVisitStr, out lastVisit);
         }
-
-        DateTime lastVisitUtc = DateTime.Parse(lastVisitStr);
-        var initialReports = await ReportService.GetNewReportsAsync(lastVisitUtc);
-
-        if (initialReports?.Data?.Any() == true)
+        var response = await ReportService.GetNewReportsAsync(lastVisit);
+        if (response.Success && response.Data != null)
         {
-            foreach (var report in initialReports.Data)
+            foreach (var report in response.Data)
+            {
                 await NotificationState.AddReportAsync(report);
+            }
         }
+        await NotificationService.StartAsync();
     }
+
 
     private void ToggleDropdown() => showDropdown = !showDropdown;
 
@@ -113,6 +118,8 @@
         await NotificationState.RemoveReportAsync(id);
         showDropdown = false;
         await JS.InvokeVoidAsync("localStorage.setItem", "LastVisit", DateTime.UtcNow.ToString("o"));
+
+
         NavigationManager.NavigateTo($"/reportdetails/{id}", forceLoad: true);
     }
 

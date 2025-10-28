@@ -19,7 +19,9 @@ namespace SafeReport.API.Controllers
         [HttpPost("AddReport")]
         public async Task<IActionResult> AddReport([FromForm] CreateReportDto reportDto)
         {
-            await _reportService.AddReportAsync(reportDto);
+            var result = await _reportService.AddReportAsync(reportDto);
+            if (!result.Success)
+                return NotFound(new { message = $"{result.Message}" });
             return Ok(new { message = "Report created successfully" });
         }
 

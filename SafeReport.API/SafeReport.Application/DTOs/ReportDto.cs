@@ -14,7 +14,7 @@
         public int IncidentTypeId { get; set; }
         public string IncidentTypeName { get; set; }
         public string Address { get; set; }
-        public string Image { get; set; }
+        public List<string> ImagePaths { get; set; } = new List<string>();
         public string TimeSinceCreated { get; set; } = string.Empty;
 
     }

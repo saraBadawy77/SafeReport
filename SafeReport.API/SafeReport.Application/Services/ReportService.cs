@@ -47,7 +47,6 @@ namespace SafeReport.Application.Services
         {
             try
             {
-
                 Expression<Func<Report, bool>> predicate = r => true;
 
                 if (filter.IncidentId.HasValue && filter.CreatedDate.HasValue && filter.IncidentTypeId.HasValue)
@@ -67,16 +66,19 @@ namespace SafeReport.Application.Services
                 if (filter.IncidentTypeId.HasValue)
                     predicate = r => r.IncidentTypeId == filter.IncidentTypeId.Value;
 
-                Expression<Func<Report, object>> include = r => r.Incident;
-                // Pass to repository
+                // Fetch paged reports with related entities
                 var reports = await _reportRepository.GetPagedAsync(
                     filter.PageNumber.Value,
                     filter.PageSize.Value,
                     predicate,
-                    include);
+                    r => r.CreatedDate,
+                    descending: true,
+                    r => r.Incident,
+                    r => r.Images);
 
                 var totalCount = await _reportRepository.GetTotalCountAsync(predicate);
-                // Get related incident type info
+
+                // Prepare incident types dictionary
                 var incidentTypeIds = reports.Select(r => r.IncidentTypeId).Distinct().ToList();
                 var incidentIds = reports.Select(r => r.IncidentId).Distinct().ToList();
 
@@ -87,42 +89,14 @@ namespace SafeReport.Application.Services
 
                 var currentCulture = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
 
-                // Prepare incident types dictionary
                 var incidentTypeDict = incidentTypes.ToDictionary(
                     t => (t.IncidentId, t.Id),
                     t => currentCulture == "ar" ? t.NameAr ?? t.NameEn : t.NameEn ?? t.NameAr
                 );
 
                 // Map reports
-                var reportDtos = reports.Select(report =>
-                {
-                    var description = currentCulture == "ar"
-                        ? report.DescriptionAr ?? report.Description
-                        : report.Description ?? report.DescriptionAr;
+                var reportDtos = reports.Select(report => MapReportToDto(report, incidentTypeDict, currentCulture)).ToList();
 
-                    var incidentName = currentCulture == "ar"
-                        ? report.Incident?.NameAr ?? report.Incident?.NameEn
-                        : report.Incident?.NameEn ?? report.Incident?.NameAr;
-
-                    incidentTypeDict.TryGetValue((report.IncidentId, report.IncidentTypeId), out string? incidentTypeName);
-
-                    return new ReportDto
-                    {
-                        Id = report.Id,
-                        Description = description,
-                        CreatedDate = report.CreatedDate,
-                        IncidentId = report.IncidentId,
-                        IncidentName = incidentName ?? "N/A",
-                        IncidentTypeId = report.IncidentTypeId,
-                        IncidentTypeName = incidentTypeName ?? "N/A",
-                        Address = report.Address,
-                        Image = report.ImagePath,
-                        PhoneNumber= report.PhoneNumber,
-                        TimeSinceCreated = string.Empty
-                    };
-                }).ToList();
-
-                // Wrap in paged result
                 var pagedResult = new PagedResultDto
                 {
                     TotalCount = totalCount,
@@ -138,6 +112,44 @@ namespace SafeReport.Application.Services
                 return Response<PagedResultDto>.FailResponse($"Error: {ex.Message}");
             }
         }
+
+        #region Report Mapping 
+
+        private ReportDto MapReportToDto(Report report, Dictionary<(int IncidentId, int Id), string> incidentTypeDict, string currentCulture)
+        {
+            var description = currentCulture == "ar"
+                ? report.DescriptionAr ?? report.Description
+                : report.Description ?? report.DescriptionAr;
+
+            var incidentName = currentCulture == "ar"
+                ? report.Incident?.NameAr ?? report.Incident?.NameEn
+                : report.Incident?.NameEn ?? report.Incident?.NameAr;
+
+            incidentTypeDict.TryGetValue((report.IncidentId, report.IncidentTypeId), out string? incidentTypeName);
+
+            var images = report.Images?
+                .Where(img => !string.IsNullOrEmpty(img.ImagePath))
+                .Select(img => img.ImagePath)
+                .ToList() ?? new List<string>();
+
+            return new ReportDto
+            {
+                Id = report.Id,
+                Description = description,
+                CreatedDate = report.CreatedDate,
+                IncidentId = report.IncidentId,
+                IncidentName = incidentName ?? "N/A",
+                IncidentTypeId = report.IncidentTypeId,
+                IncidentTypeName = incidentTypeName ?? "N/A",
+                Address = report.Address,
+                ImagePaths = images,
+                PhoneNumber = report.PhoneNumber,
+                TimeSinceCreated = string.Empty
+            };
+        }
+
+        #endregion
+
         public async Task<Response<string>> SoftDeleteReportAsync(Guid id)
         {
             try
@@ -180,34 +192,31 @@ namespace SafeReport.Application.Services
                 if (incidentExists is null)
                     return Response<string>.FailResponse("Invalid IncidentId.");
                 var incidentType = await _incidentTypeRepository.GetByIdAsync(reportDto.IncidentTypeId);
-                if (incidentType == null )
+                if (incidentType == null)
                     return Response<string>.FailResponse("Incident type not found");
+
+                var selectedIncidentType = await _incidentTypeRepository.FindAsync(
+                    t => t.IncidentId == reportDto.IncidentId &&
+                         t.Id == reportDto.IncidentTypeId &&
+                         !t.IsDeleted);
+                if (selectedIncidentType is null)
+                    return Response<string>.FailResponse("The selected incident type does not belong to the chosen incident.");
+
                 var report = _mapper.Map<Report>(reportDto);
+                //        // Get address from coordinates
+                //        // report.Address = await GetAddressFromCoordinatesAsync(reportDto.Latitude, reportDto.Longitude);
+                report.Address = "El Tahrir Square, Qasr Al Doubara, Bab al Luq, Cairo, 11519, Egypt";  //for test
 
-                // Get address from coordinates
-                // report.Address = await GetAddressFromCoordinatesAsync(reportDto.Latitude, reportDto.Longitude);
-                report.Address = "El Tahrir Square, Qasr Al Doubara, Bab al Luq, Cairo, 11519, Egypt";  // for test 
-
-                if (reportDto.Image != null)
+                // رفع وحفظ الصور إذا وجدت
+                if (reportDto.Images != null && reportDto.Images.Any())
                 {
-                    var uploadsFolder = Path.Combine(_env.WebRootPath, "images");
-                    Directory.CreateDirectory(uploadsFolder);
-
-                    var fileName = Guid.NewGuid() + Path.GetExtension(reportDto.Image.FileName);
-                    var filePath = Path.Combine(uploadsFolder, fileName);
-
-                    using var stream = new FileStream(filePath, FileMode.Create);
-                    await reportDto.Image.CopyToAsync(stream);
-
-                    report.ImagePath = $"images/{fileName}";
+                    report.Images = await SaveReportImagesAsync(reportDto.Images);
                 }
-
-
                 await _reportRepository.AddAsync(report);
                 await _reportRepository.SaveChangesAsync();
 
-                ReportDto reportdto = _mapper.Map<ReportDto>(report);
-                await _hubContext.Clients.All.SendAsync("ReceiveNewReport", reportdto);
+                var reportDtoResult = _mapper.Map<ReportDto>(report);
+                await _hubContext.Clients.All.SendAsync("ReceiveNewReport", reportDtoResult);
 
                 return Response<string>.SuccessResponse("Report added successfully.");
             }
@@ -215,9 +224,37 @@ namespace SafeReport.Application.Services
             {
                 return Response<string>.FailResponse($"Error adding report: {ex.Message}");
             }
+        }
+        private async Task<List<ReportImage>> SaveReportImagesAsync(List<IFormFile>? images)
+        {
+            var savedImages = new List<ReportImage>();
+            if (images == null || !images.Any())
+                return savedImages;
 
+            var uploadsFolder = Path.Combine(_env.WebRootPath, "images");
+            Directory.CreateDirectory(uploadsFolder);
 
+            foreach (var file in images)
+            {
+                if (file != null && file.Length > 0)
+                {
+                    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+                    var filePath = Path.Combine(uploadsFolder, fileName);
 
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+
+                    savedImages.Add(new ReportImage
+                    {
+                        ImagePath = $"images/{fileName}",
+                        CreatedDate = DateTime.UtcNow
+                    });
+                }
+            }
+
+            return savedImages;
         }
         private async Task<string?> GetAddressFromCoordinatesAsync(double latitude, double longitude)
         {
@@ -257,8 +294,8 @@ namespace SafeReport.Application.Services
             try
             {
                 Expression<Func<Report, object>>[] includes =
-                   { r => r.Incident };
-                var report = await _reportRepository.FindAsync(r => r.Id == id , includes);
+                { r => r.Incident, r => r.Images };
+                var report = await _reportRepository.FindAsync(r => r.Id == id, includes);
 
                 if (report == null)
                     return Response<ReportDto>.FailResponse("Report not found.");
@@ -282,6 +319,12 @@ namespace SafeReport.Application.Services
                     ? incidentType?.NameAr ?? incidentType?.NameEn
                     : incidentType?.NameEn ?? incidentType?.NameAr;
 
+                // Map images to full URLs
+                var imageUrls = report.Images?
+                    .Where(img => !string.IsNullOrEmpty(img.ImagePath))
+                    .Select(img => ImageUrl.GetFullImageUrl(img.ImagePath, _httpContextAccessor))
+                    .ToList() ?? new List<string>();
+
                 // Map to DTO
                 var reportDto = new ReportDto
                 {
@@ -293,7 +336,7 @@ namespace SafeReport.Application.Services
                     IncidentTypeId = report.IncidentTypeId,
                     IncidentTypeName = incidentTypeName ?? "N/A",
                     Address = report.Address ?? "N/A",
-                    Image = ImageUrl.GetFullImageUrl(report.ImagePath, _httpContextAccessor),
+                    ImagePaths = imageUrls,
                     PhoneNumber = report.PhoneNumber,
                     TimeSinceCreated = GetTimeSinceCreated(report.CreatedDate)
                 };
@@ -317,14 +360,51 @@ namespace SafeReport.Application.Services
         }
         public async Task<Response<List<ReportDto>>> GetNewReports(DateTime lastVisitUtc)
         {
-            Expression<Func<Report, bool>> filter = r => r.CreatedDate > lastVisitUtc;
-            var reports = await _reportRepository.FindAllIncludes(
-                filter,
-                r => r.Incident
-            );
-            var reportDtos = _mapper.Map<List<ReportDto>>(reports);
-            return Response<List<ReportDto>>.SuccessResponse(reportDtos, $"Found {reportDtos.Count} new reports.");
+            try
+            {
+                // Filter reports created after the user's last visit
+                Expression<Func<Report, bool>> filter = r => r.CreatedDate > lastVisitUtc;
+
+                var reports = await _reportRepository.FindAllIncludes(
+                    filter,
+                    r => r.Incident,
+                    r => r.Images
+                );
+                // Get related incident types
+                var incidentTypeIds = reports.Select(r => r.IncidentTypeId).Distinct().ToList();
+                var incidentIds = reports.Select(r => r.IncidentId).Distinct().ToList();
+
+                var incidentTypes = await _incidentTypeRepository.FindAllAsync(
+                    t => incidentIds.Contains(t.IncidentId) &&
+                         incidentTypeIds.Contains(t.Id) &&
+                         !t.IsDeleted);
+
+                var currentCulture = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+
+                // Build dictionary for incident type names (localized)
+                var incidentTypeDict = incidentTypes.ToDictionary(
+                    t => (t.IncidentId, t.Id),
+                    t => currentCulture == "ar"
+                        ? t.NameAr ?? t.NameEn
+                        : t.NameEn ?? t.NameAr
+                );
+
+                // Map all reports to DTOs
+                var reportDtos = reports.Select(report =>
+                    MapReportToDto(report, incidentTypeDict, currentCulture)
+                ).ToList();
+
+                return Response<List<ReportDto>>.SuccessResponse(reportDtos, $"Found {reportDtos.Count} new reports.");
+            }
+            catch (Exception ex)
+            {
+                return Response<List<ReportDto>>.FailResponse($"Error fetching new reports: {ex.Message}");
+            }
         }
+
+
+
+
 
 
 

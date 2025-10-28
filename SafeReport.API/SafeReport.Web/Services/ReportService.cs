@@ -152,14 +152,9 @@ public class ReportService : IReportService
             return Response<ReportDTO>.FailResponse($"Error fetching report details: {ex.Message}");
         }
     }
-    //public async Task<int> GetNewReportsCountAsync(DateTime lastVisitUtc)
-    //{
-    //    string url = $"api/Report/GetNewReportsCount?lastVisitUtc={Uri.EscapeDataString(lastVisitUtc.ToString("o"))}";
-    //    var response = await _httpClient.GetFromJsonAsync<Response<int>>(url);
-    //    return response?.Data ?? 0;
-    //}
     public async Task<Response<List<ReportDTO>>> GetNewReportsAsync(DateTime lastVisitUtc)
     {
+        AddCultureHeader();
         string url = $"api/Report/GetNewReports?lastVisitUtc={Uri.EscapeDataString(lastVisitUtc.ToString("o"))}";
 
         try

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using SafeReport.Web.DTOs;
 using SafeReport.Web.Services;
+using System.Globalization;
 using static System.Net.WebRequestMethods;
 
 namespace SafeReport.Web.Pages
@@ -41,7 +42,15 @@ namespace SafeReport.Web.Pages
                 isLoading = false;
             }
         }
-
+        private string GetCultureClass()
+        {
+            return CultureInfo.CurrentCulture.Name switch
+            {
+                "ar-EG" => "rtl",
+                "en-US" => "ltr",
+                _ => "ltr"
+            };
+        }
         private string GetFullImageUrl(string relativePath)
         {
             if (string.IsNullOrEmpty(relativePath))

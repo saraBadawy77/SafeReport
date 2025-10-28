@@ -1,47 +1,226 @@
-﻿@page "/reportdetails/{ReportId:guid}"
+﻿@* @page "/reportdetails/{ReportId:guid}"
 @inject IStringLocalizer<Resource> _Localizer
+
 <PageTitle>@_Localizer["ReportDetails"]</PageTitle>
-<h3 class="text-center my-4">@_Localizer["ReportDetails"]</h3>
 
-@if (isLoading)
-{
-    <p><em>@_Localizer["Loading"]</em></p>
-}
-else if (loadFailed)
-{
-    <p class="text-danger">@_Localizer["FailedToLoadDetails"]</p>
-}
-else if (report != null)
-{
-    <div class="card shadow-sm p-4 mb-4" style="max-width: 600px; margin: auto;">
-        <h4 class="mb-3">@report.IncidentName (@report.IncidentTypeName)</h4>
+<div class="container my-5">
+    @if (isLoading)
+    {
+        <div class="text-center mt-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2">@_Localizer["Loading"]...</p>
+        </div>
+    }
+    else if (loadFailed)
+    {
+        <div class="alert alert-danger text-center my-4">
+            @_Localizer["FailedToLoadDetails"]
+        </div>
+    }
+    else if (report != null)
+    {
+        <div class="report-details">
+            <h2 class="fw-bold text-primary text-center mb-4">
+                @report.IncidentName (@report.IncidentTypeName)
+            </h2>
 
-        <p><strong>@_Localizer["Description"]:</strong> @report.Description</p>
-        <p><strong>@_Localizer["PhoneNumber"]:</strong> @report.PhoneNumber</p>
-        <p><strong>@_Localizer["Address"]:</strong> @report.Address</p>
-        <p>
-            <strong>@_Localizer["CreatedDate"]:</strong> @report.CreatedDate.ToLocalTime().ToString("f", CultureInfo.CurrentCulture)
-        </p>
-        <p>
-            <strong>@_Localizer["TimeSinceCreated"]:</strong>
-            @TranslateTimeSinceCreated(report.TimeSinceCreated)
-        </p>
-
-
-        @if (!string.IsNullOrEmpty(report.Image))
-        {
-            <div class="mt-3 text-center">
-                <img src="@GetFullImageUrl(report.Image)" alt="@_Localizer["ReportImage"]"
-                     style="max-width: 100%; height: auto; border-radius: 8px;" />
+            <div class="details-section mb-4">
+                <p><strong>@_Localizer["Description"]: </strong>@report.Description</p>
+                <p><strong>@_Localizer["PhoneNumber"]: </strong>@report.PhoneNumber</p>
+                <p><strong>@_Localizer["Address"]: </strong>@report.Address</p>
+                <p><strong>@_Localizer["CreatedDate"]: </strong>@report.CreatedDate.ToLocalTime().ToString("f", CultureInfo.CurrentCulture)</p>
+                <p><strong>@_Localizer["TimeSinceCreated"]: </strong>@TranslateTimeSinceCreated(report.TimeSinceCreated)</p>
             </div>
+
+            @if (report.ImagePaths != null && report.ImagePaths.Any())
+            {
+                <div id="reportImagesCarousel" class="carousel slide mb-4" data-bs-ride="carousel" data-bs-interval="4000">
+                    <div class="carousel-inner">
+                        @for (int i = 0; i < report.ImagePaths.Count; i++)
+                        {
+                            var imageUrl = GetFullImageUrl(report.ImagePaths[i]);
+                            <div class="carousel-item @(i == 0 ? "active" : "")">
+                                <img src="@imageUrl"
+                                     class="d-block w-100 rounded-3"
+                                     style="max-height: 500px; object-fit: cover;"
+                                     alt="@_Localizer["ReportImage"] @i" />
+                            </div>
+                        }
+                    </div>
+
+                    @if (report.ImagePaths.Count > 1)
+                    {
+                        <button class="carousel-control-prev" type="button" data-bs-target="#reportImagesCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon bg-dark rounded-circle p-2" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#reportImagesCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon bg-dark rounded-circle p-2" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="text-muted text-center">@_Localizer["NoImagesAvailable"]</p>
+            }
+
+            <div class="text-center mt-4">
+                <button class="btn btn-outline-primary px-4" @onclick="GoBack">
+                    <i class="bi bi-arrow-left-circle me-2"></i> @_Localizer["Back"]
+                </button>
+            </div>
+        </div>
+    }
+    else
+    {
+        <p class="text-center text-muted">@_Localizer["NoDetailsAvailable"]</p>
+    }
+</div> *@
+
+@page "/reportdetails/{ReportId:guid}"
+@inject IStringLocalizer<Resource> _Localizer
+
+<PageTitle>@_Localizer["ReportDetails"]</PageTitle>
+
+<div class="container py-5 report-page" dir="@GetCultureClass()">
+
+    @if (isLoading)
+    {
+        <div class="text-center mt-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-3 fs-5 text-muted">@_Localizer["Loading"]...</p>
+        </div>
+    }
+    else if (loadFailed)
+    {
+        <div class="alert alert-danger text-center shadow-sm my-5 fs-5">
+            @_Localizer["FailedToLoadDetails"]
+        </div>
+    }
+    else if (report != null)
+    {
+        <div class="report-details">
+
+            <!-- 🎯 Carousel Section -->
+            @if (report.ImagePaths != null && report.ImagePaths.Any())
+            {
+                <div id="reportImagesCarousel" class="carousel slide mb-4 rounded-4  overflow-hidden" data-bs-ride="carousel" data-bs-interval="5000">
+                    <div class="carousel-inner">
+                        @for (int i = 0; i < report.ImagePaths.Count; i++)
+                        {
+                            var imageUrl = GetFullImageUrl(report.ImagePaths[i]);
+                            <div class="carousel-item @(i == 0 ? "active" : "")">
+                                <img src="@imageUrl" class="d-block w-100" style="max-height: 480px; object-fit: cover;" alt="@_Localizer["ReportImage"] @i" />
+                            </div>
+                        }
+                    </div>
+
+                    @if (report.ImagePaths.Count > 1)
+                    {
+                        <button class="carousel-control-prev" type="button" data-bs-target="#reportImagesCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon bg-dark rounded-circle p-2 opacity-75"></span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#reportImagesCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon bg-dark rounded-circle p-2 opacity-75"></span>
+                        </button>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="no-image text-center py-5">
+                    <i class="bi bi-image text-muted display-4"></i>
+                    <p class="text-muted mt-3">@_Localizer["NoImagesAvailable"]</p>
+                </div>
+            }
+
+            <!-- 📋 Report Info -->
+            <div class="report-info p-4 rounded-4 bg-light shadow-sm">
+                <h2 class="text-primary fw-bold text-center mb-3">@report.IncidentName</h2>
+                <h5 class="text-secondary text-center mb-4">(@report.IncidentTypeName)</h5>
+
+                <div class="row justify-content-center">
+                    <div class="col-md-10">
+                        <p class="fs-5 mb-2">
+                            <i class="bi bi-chat-left-text text-primary me-2"></i>
+                            <strong>@_Localizer["Description"]:</strong> @report.Description
+                        </p>
+                        <p class="fs-5 mb-2">
+                            <i class="bi bi-geo-alt text-danger me-2"></i>
+                            <strong>@_Localizer["Address"]:</strong> @report.Address
+                        </p>
+                        <p class="fs-5 mb-2">
+                            <i class="bi bi-telephone text-success me-2"></i>
+                            <strong>@_Localizer["PhoneNumber"]:</strong> @report.PhoneNumber
+                        </p>
+                        <p class="fs-5 mb-2">
+                            <i class="bi bi-calendar-event text-info me-2"></i>
+                            <strong>@_Localizer["CreatedDate"]:</strong>
+                            @report.CreatedDate.ToLocalTime().ToString("f", CultureInfo.CurrentCulture)
+                        </p>
+                        <p class="fs-5">
+                            <i class="bi bi-clock-history text-warning me-2"></i>
+                            <strong>@_Localizer["TimeSinceCreated"]:</strong> @TranslateTimeSinceCreated(report.TimeSinceCreated)
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🔙 Back Button -->
+            <div class="text-center mt-5">
+                <button class="btn btn-lg btn-outline-primary px-5 shadow-sm back-btn" @onclick="GoBack">
+                    <i class="bi bi-arrow-left-circle"></i>
+                    @_Localizer["Back"]
+                </button>
+            </div>
+        </div>
+    }
+    else
+    {
+        <p class="text-center text-muted fs-5">@_Localizer["NoDetailsAvailable"]</p>
+    }
+</div>
+
+<style>
+    .rtl {
+        direction: rtl;
+        text-align: right;
+    }
+
+    .ltr {
+        direction: ltr;
+        text-align: left;
+    }
+    .report-info {
+        transition: all 0.3s ease;
+    }
+
+        .report-info:hover {
+            transform: translateY(-7px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
 
-        <button class="btn btn-secondary mt-4" @onclick="GoBack">
-            @_Localizer["Back"]
-        </button>
-    </div>
-}
-else
-{
-    <p>@_Localizer["NoDetailsAvailable"]</p>
-}
+    .carousel img {
+        border-radius: 12px;
+    }
+
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        background-size: 70%;
+    }
+
+    .no-image i {
+        opacity: 0.6;
+    }
+
+    .back-btn i {
+        margin-right: 0.5rem;
+    }
+
+    html[dir="rtl"] .back-btn i {
+        margin-left: 0.5rem;
+        margin-right: 0;
+    }
+</style>
