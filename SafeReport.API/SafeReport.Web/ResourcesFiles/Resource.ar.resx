@@ -117,10 +117,151 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Actions" xml:space="preserve">
+    <value>الإجراءات</value>
+  </data>
+  <data name="Address" xml:space="preserve">
+    <value>العنوان</value>
+  </data>
+  <data name="Arabic" xml:space="preserve">
+    <value>العربية</value>
+  </data>
+  <data name="AssaultSafetyDescription" xml:space="preserve">
+    <value>وثّق وتابع حالات الاعتداء أو أي تهديدات للسلامة. ابقَ على اطلاع وأبلغ السلطات المحلية.</value>
+  </data>
+  <data name="AssaultSafetyTitle" xml:space="preserve">
+    <value>الاعتداء والسلامة</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>رجوع</value>
+  </data>
+  <data name="ConfirmDeleteMessage" xml:space="preserve">
+    <value>هل أنت متأكد أنك تريد حذف هذا التقرير؟</value>
+  </data>
+  <data name="CreatedDate" xml:space="preserve">
+    <value>تاريخ الإنشاء</value>
+  </data>
+  <data name="Date" xml:space="preserve">
+    <value>التاريخ</value>
+  </data>
+  <data name="DayAgo" xml:space="preserve">
+    <value>منذ {0} يوم</value>
+  </data>
+  <data name="DaysAgo" xml:space="preserve">
+    <value>منذ {0} أيام</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>حذف</value>
+  </data>
+  <data name="DeleteFailedMessage" xml:space="preserve">
+    <value>فشل في حذف التقرير ❌</value>
+  </data>
+  <data name="DeleteSuccessMessage" xml:space="preserve">
+    <value>تم حذف التقرير بنجاح ✅</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>الوصف</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>التفاصيل</value>
+  </data>
+  <data name="English" xml:space="preserve">
+    <value>الإنجليزية</value>
+  </data>
+  <data name="FailedToLoadDetails" xml:space="preserve">
+    <value>فشل في تحميل تفاصيل التقرير.</value>
+  </data>
+  <data name="FireIncidentsDescription" xml:space="preserve">
+    <value>بلّغ فوراً عن أي حادث حريق. نظامنا يضمن وصول البلاغ إلى الجهات المختصة بسرعة.</value>
+  </data>
+  <data name="FireIncidentsTitle" xml:space="preserve">
+    <value>حوادث الحريق</value>
+  </data>
   <data name="Home" xml:space="preserve">
-    <value>تيست  عربى </value>
+    <value>الرئيسية</value>
+  </data>
+  <data name="HomeDescription" xml:space="preserve">
+    <value>قدّم وتابع بلاغات الحوادث بسرعة وكفاءة. سواء كانت حرائق، اعتداءات أو طوارئ أخرى، سيف ريبورت يحافظ على سلامة مجتمعك.</value>
+  </data>
+  <data name="HomeTitle" xml:space="preserve">
+    <value>مرحباً بك في سيف ريبورت</value>
+  </data>
+  <data name="HourAgo" xml:space="preserve">
+    <value>منذ {0} ساعة</value>
+  </data>
+  <data name="HoursAgo" xml:space="preserve">
+    <value>منذ {0} ساعات</value>
+  </data>
+  <data name="Incident" xml:space="preserve">
+    <value>الحادث</value>
+  </data>
+  <data name="Incidents" xml:space="preserve">
+    <value>الحوادث</value>
+  </data>
+  <data name="IncidentType" xml:space="preserve">
+    <value>نوع الحادث</value>
+  </data>
+  <data name="IncidentTypes" xml:space="preserve">
+    <value>أنواع الحوادث</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>اللغة:</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>جاري التحميل...</value>
+  </data>
+  <data name="LoadingReports" xml:space="preserve">
+    <value>جاري تحميل التقارير...</value>
+  </data>
+  <data name="MinuteAgo" xml:space="preserve">
+    <value>منذ {0} دقيقة</value>
+  </data>
+  <data name="MinutesAgo" xml:space="preserve">
+    <value>منذ {0} دقائق</value>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>التالي</value>
+  </data>
+  <data name="NoDetailsAvailable" xml:space="preserve">
+    <value>لا توجد تفاصيل متاحة لهذا التقرير.</value>
+  </data>
+  <data name="OtherIncidentsDescription" xml:space="preserve">
+    <value>بلّغ عن أي أحداث غير اعتيادية أو حرجة أخرى. سيف ريبورت يساعد على متابعة وإدارة الحوادث المجتمعية بفعالية.</value>
+  </data>
+  <data name="OtherIncidentsTitle" xml:space="preserve">
+    <value>حوادث أخرى</value>
+  </data>
+  <data name="PhoneNumber" xml:space="preserve">
+    <value>رقم الهاتف</value>
+  </data>
+  <data name="Previous" xml:space="preserve">
+    <value>السابق</value>
+  </data>
+  <data name="Print" xml:space="preserve">
+    <value>طباعة</value>
+  </data>
+  <data name="PrintFailedMessage" xml:space="preserve">
+    <value>فشل في فتح تقرير الـPDF.</value>
+  </data>
+  <data name="ReportDetails" xml:space="preserve">
+    <value>تفاصيل التقرير</value>
+  </data>
+  <data name="ReportImage" xml:space="preserve">
+    <value>صور التقرير</value>
   </data>
   <data name="Reports" xml:space="preserve">
-    <value>تقارير عربى </value>
+    <value>التقارير</value>
+  </data>
+  <data name="ReportsList" xml:space="preserve">
+    <value>قائمة التقارير</value>
+  </data>
+  <data name="Reset" xml:space="preserve">
+    <value>إعادة تعيين</value>
+  </data>
+  <data name="TimeSinceCreated" xml:space="preserve">
+    <value>المدة منذ الإنشاء</value>
+  </data>
+  <data name="ViewReports" xml:space="preserve">
+    <value>عرض التقارير</value>
   </data>
 </root>

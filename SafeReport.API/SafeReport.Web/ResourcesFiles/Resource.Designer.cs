@@ -61,7 +61,187 @@ namespace SafeReport.Web.ResourcesFiles {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Home test .
+        ///   Looks up a localized string similar to Actions.
+        /// </summary>
+        public static string Actions {
+            get {
+                return ResourceManager.GetString("Actions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Address.
+        /// </summary>
+        public static string Address {
+            get {
+                return ResourceManager.GetString("Address", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Arabic.
+        /// </summary>
+        public static string Arabic {
+            get {
+                return ResourceManager.GetString("Arabic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Document and track assaults or any threats to safety. Stay informed and alert your local authorities..
+        /// </summary>
+        public static string AssaultSafetyDescription {
+            get {
+                return ResourceManager.GetString("AssaultSafetyDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Assault &amp; Safety.
+        /// </summary>
+        public static string AssaultSafetyTitle {
+            get {
+                return ResourceManager.GetString("AssaultSafetyTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Back.
+        /// </summary>
+        public static string Back {
+            get {
+                return ResourceManager.GetString("Back", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to delete this report?.
+        /// </summary>
+        public static string ConfirmDeleteMessage {
+            get {
+                return ResourceManager.GetString("ConfirmDeleteMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Created Date.
+        /// </summary>
+        public static string CreatedDate {
+            get {
+                return ResourceManager.GetString("CreatedDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Date.
+        /// </summary>
+        public static string Date {
+            get {
+                return ResourceManager.GetString("Date", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} day ago.
+        /// </summary>
+        public static string DayAgo {
+            get {
+                return ResourceManager.GetString("DayAgo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} days ago.
+        /// </summary>
+        public static string DaysAgo {
+            get {
+                return ResourceManager.GetString("DaysAgo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete.
+        /// </summary>
+        public static string Delete {
+            get {
+                return ResourceManager.GetString("Delete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to delete the report ❌.
+        /// </summary>
+        public static string DeleteFailedMessage {
+            get {
+                return ResourceManager.GetString("DeleteFailedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Report deleted successfully ✅.
+        /// </summary>
+        public static string DeleteSuccessMessage {
+            get {
+                return ResourceManager.GetString("DeleteSuccessMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Description.
+        /// </summary>
+        public static string Description {
+            get {
+                return ResourceManager.GetString("Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Details.
+        /// </summary>
+        public static string Details {
+            get {
+                return ResourceManager.GetString("Details", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to English.
+        /// </summary>
+        public static string English {
+            get {
+                return ResourceManager.GetString("English", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to load report details..
+        /// </summary>
+        public static string FailedToLoadDetails {
+            get {
+                return ResourceManager.GetString("FailedToLoadDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Report any fire emergencies immediately. Our system ensures your report reaches the right authorities fast..
+        /// </summary>
+        public static string FireIncidentsDescription {
+            get {
+                return ResourceManager.GetString("FireIncidentsDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fire Incidents.
+        /// </summary>
+        public static string FireIncidentsTitle {
+            get {
+                return ResourceManager.GetString("FireIncidentsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Home.
         /// </summary>
         public static string Home {
             get {
@@ -70,11 +250,254 @@ namespace SafeReport.Web.ResourcesFiles {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Reports  test .
+        ///   Looks up a localized string similar to Submit and track incident reports quickly and efficiently. Whether it’s fire, assault, or other emergencies, SafeReport keeps your community safe..
+        /// </summary>
+        public static string HomeDescription {
+            get {
+                return ResourceManager.GetString("HomeDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Welcome to SafeReport.
+        /// </summary>
+        public static string HomeTitle {
+            get {
+                return ResourceManager.GetString("HomeTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} hour ago.
+        /// </summary>
+        public static string HourAgo {
+            get {
+                return ResourceManager.GetString("HourAgo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} hours ago.
+        /// </summary>
+        public static string HoursAgo {
+            get {
+                return ResourceManager.GetString("HoursAgo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Incident.
+        /// </summary>
+        public static string Incident {
+            get {
+                return ResourceManager.GetString("Incident", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Incidents.
+        /// </summary>
+        public static string Incidents {
+            get {
+                return ResourceManager.GetString("Incidents", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Incident Type.
+        /// </summary>
+        public static string IncidentType {
+            get {
+                return ResourceManager.GetString("IncidentType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Incident Types.
+        /// </summary>
+        public static string IncidentTypes {
+            get {
+                return ResourceManager.GetString("IncidentTypes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Language:.
+        /// </summary>
+        public static string Language {
+            get {
+                return ResourceManager.GetString("Language", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading....
+        /// </summary>
+        public static string Loading {
+            get {
+                return ResourceManager.GetString("Loading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading reports....
+        /// </summary>
+        public static string LoadingReports {
+            get {
+                return ResourceManager.GetString("LoadingReports", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} minute ago.
+        /// </summary>
+        public static string MinuteAgo {
+            get {
+                return ResourceManager.GetString("MinuteAgo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} minutes ago.
+        /// </summary>
+        public static string MinutesAgo {
+            get {
+                return ResourceManager.GetString("MinutesAgo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Next.
+        /// </summary>
+        public static string Next {
+            get {
+                return ResourceManager.GetString("Next", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No report details available..
+        /// </summary>
+        public static string NoDetailsAvailable {
+            get {
+                return ResourceManager.GetString("NoDetailsAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Report any other unusual or critical events. SafeReport helps monitor and manage community incidents effectively..
+        /// </summary>
+        public static string OtherIncidentsDescription {
+            get {
+                return ResourceManager.GetString("OtherIncidentsDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Other Incidents.
+        /// </summary>
+        public static string OtherIncidentsTitle {
+            get {
+                return ResourceManager.GetString("OtherIncidentsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Phone Number.
+        /// </summary>
+        public static string PhoneNumber {
+            get {
+                return ResourceManager.GetString("PhoneNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Previous.
+        /// </summary>
+        public static string Previous {
+            get {
+                return ResourceManager.GetString("Previous", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Print.
+        /// </summary>
+        public static string Print {
+            get {
+                return ResourceManager.GetString("Print", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to open PDF report..
+        /// </summary>
+        public static string PrintFailedMessage {
+            get {
+                return ResourceManager.GetString("PrintFailedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Report Details.
+        /// </summary>
+        public static string ReportDetails {
+            get {
+                return ResourceManager.GetString("ReportDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Report Images.
+        /// </summary>
+        public static string ReportImage {
+            get {
+                return ResourceManager.GetString("ReportImage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reports.
         /// </summary>
         public static string Reports {
             get {
                 return ResourceManager.GetString("Reports", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reports List.
+        /// </summary>
+        public static string ReportsList {
+            get {
+                return ResourceManager.GetString("ReportsList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reset.
+        /// </summary>
+        public static string Reset {
+            get {
+                return ResourceManager.GetString("Reset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Time Since Created.
+        /// </summary>
+        public static string TimeSinceCreated {
+            get {
+                return ResourceManager.GetString("TimeSinceCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View Reports.
+        /// </summary>
+        public static string ViewReports {
+            get {
+                return ResourceManager.GetString("ViewReports", resourceCulture);
             }
         }
     }

@@ -1,56 +1,13 @@
 ﻿@page "/reports"
 @using SafeReport.Web.DTOs
 @using SafeReport.Web.Services
+<PageTitle>@_Localizer["Reports"]</PageTitle>
+<h3 class="mb-4">@_Localizer["ReportsList"]</h3>
 
-<PageTitle>Reports</PageTitle>
-<h3 class="mb-4">Reports List</h3>
-@* <div class="row mb-3">
-    <div class="col-md-3">
-        <label class="form-label">Date</label>
-        <input type="date" class="form-control"
-               @bind="filterDate"
-               @bind:event="oninput"
-               @onchange="@(e => OnDateChanged(e))" />
-    </div>
-
-    <div class="col-md-3">
-        <label class="form-label">Incident Type</label>
-        <select class="form-select"
-                @bind="incidentTypeId"
-                @bind:event="oninput"
-                @onchange="@(e => OnIncidentTypeChanged(e))"
-                disabled="@(!filterType.HasValue)">
-            <option value="">Incident Types</option>
-            @foreach (var type in incidentTypes)
-            {
-                <option value="@type.Id">@type.Name</option>
-            }
-        </select>
-    </div>
-
-    <div class="col-md-3">
-        <label class="form-label">Incident</label>
-        <select class="form-select"
-                @bind="filterType"
-                @bind:event="oninput"
-                @onchange="@(e => OnIncidentChanged(e))">
-            <option value="">Incidents</option>
-            @foreach (var item in reportTypes)
-            {
-                <option value="@item.Id">@item.Name</option>
-            }
-        </select>
-    </div>
-
-    <div class="col-md-3">
-        <button class="btn btn-secondary " @onclick="ResetFilters">Reset</button>
-    </div>
-
-</div> *@
 <div class="row mb-3 align-items-end">
 
     <div class="col-md-3">
-        <label class="form-label">Date</label>
+        <label class="form-label">@_Localizer["Date"]</label>
         <input type="date" class="form-control"
                @bind="filterDate"
                @bind:event="oninput"
@@ -58,13 +15,13 @@
     </div>
 
     <div class="col-md-3">
-        <label class="form-label">Incident Type</label>
+        <label class="form-label">@_Localizer["IncidentType"]</label>
         <select class="form-select"
                 @bind="incidentTypeId"
                 @bind:event="oninput"
                 @onchange="@(e => OnIncidentTypeChanged(e))"
                 disabled="@(!filterType.HasValue)">
-            <option value="">Incident Types</option>
+            <option value="">@_Localizer["IncidentTypes"]</option>
             @foreach (var type in incidentTypes)
             {
                 <option value="@type.Id">@type.Name</option>
@@ -73,12 +30,12 @@
     </div>
 
     <div class="col-md-3">
-        <label class="form-label">Incident</label>
+        <label class="form-label">@_Localizer["Incident"]</label>
         <select class="form-select"
                 @bind="filterType"
                 @bind:event="oninput"
                 @onchange="@(e => OnIncidentChanged(e))">
-            <option value="">Incidents</option>
+            <option value="">@_Localizer["Incidents"]</option>
             @foreach (var item in reportTypes)
             {
                 <option value="@item.Id">@item.Name</option>
@@ -86,29 +43,27 @@
         </select>
     </div>
 
-    <div class="col-md-3 d-flex justify-content-start">
+    <div class="col-md-3 d-flex align-items-end">
         <button class="btn btn-secondary btn-m" @onclick="ResetFilters">
-            Reset
+            @_Localizer["Reset"]
         </button>
     </div>
 
 </div>
-
-
 @if (pagedReports is null || pagedReports.Count == 0)
 {
-    <p>Loading reports....</p>
+    <p>@_Localizer["LoadingReports"]</p>
 }
 else
 {
     <table class="table table-striped">
         <thead class="table-dark">
             <tr>
-                <th>Incident</th>
-                <th>Incident Type</th>
-                <th>Description</th>
-                <th>Created Date</th>
-                <th>Actions</th>
+                <th>@_Localizer["Incident"]</th>
+                <th>@_Localizer["IncidentType"]</th>
+                <th>@_Localizer["Description"]</th>
+                <th>@_Localizer["CreatedDate"]</th>
+                <th>@_Localizer["Actions"]</th>
             </tr>
         </thead>
         <tbody>
@@ -121,13 +76,13 @@ else
                     <td>@report.CreatedDate.ToString("yyyy-MM-dd HH:mm")</td>
                     <td>
                         <button class="btn btn-sm btn-info me-1" @onclick="() => ShowDetails(report.Id)">
-                            <i class="bi bi-info-circle"></i> Details
+                            <i class="bi bi-info-circle"></i> @_Localizer["Details"]
                         </button>
                         <button class="btn btn-sm btn-primary me-1" @onclick="() => PrintReport(report.Id)">
-                            <i class="bi bi-printer"></i> Print
+                            <i class="bi bi-printer"></i> @_Localizer["Print"]
                         </button>
-                        <button class="btn btn-sm btn-danger  me-1" @onclick="() => DeleteReport(report.Id)">
-                            <i class="bi bi-trash"></i> Delete
+                        <button class="btn btn-sm btn-danger me-1" @onclick="() => DeleteReport(report.Id)">
+                            <i class="bi bi-trash"></i> @_Localizer["Delete"]
                         </button>
                     </td>
                 </tr>
@@ -135,23 +90,22 @@ else
         </tbody>
     </table>
 
-    <!-- Pagination -->
     <nav>
         <ul class="pagination">
             <li class="page-item @(currentPage == 1 ? "disabled" : "")">
-                <button class="page-link" @onclick="PrevPage">Previous</button>
+                <button class="page-link" @onclick="PrevPage">@_Localizer["Previous"]</button>
             </li>
-               @for (int i = 1; i <= totalPages; i++)
-                 {
-                var cpage = i; 
-               <li class="page-item @(currentPage == cpage ? "active" : "")">
-                 <button class="page-link" @onclick="() => GoToPage(cpage)">@cpage</button>
-               </li>
-                 }
-
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                var cpage = i;
+                <li class="page-item @(currentPage == cpage ? "active" : "")">
+                    <button class="page-link" @onclick="() => GoToPage(cpage)">@cpage</button>
+                </li>
+            }
             <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
-                <button class="page-link" @onclick="NextPage">Next</button>
+                <button class="page-link" @onclick="NextPage">@_Localizer["Next"]</button>
             </li>
         </ul>
     </nav>
 }
+

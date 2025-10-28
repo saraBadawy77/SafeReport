@@ -1,10 +1,12 @@
-﻿
+﻿@inject IStringLocalizer<Resource> _Localizer
 <div class="form-group d-flex align-items-center gap-2">
-    <label for="cultureSelect" class="mb-0">Language:</label>
+    <label for="cultureSelect" class="mb-0">@_Localizer["Language"]</label>
     <select id="cultureSelect" class="form-control" style="width: auto;" @bind="_culture">
         @foreach (var culture in cultures)
         {
-            <option value="@culture">@culture.DisplayName</option>
+            <option value="@culture">
+                @_Localizer[culture.TwoLetterISOLanguageName == "ar" ? "Arabic" : "English"]
+            </option>
         }
     </select>
 </div>

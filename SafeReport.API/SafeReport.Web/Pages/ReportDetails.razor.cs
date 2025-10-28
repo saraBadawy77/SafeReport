@@ -53,10 +53,35 @@ namespace SafeReport.Web.Pages
 
             return $"{baseUri}/{relativePath.Replace("\\", "/")}";
         }
+        private string TranslateTimeSinceCreated(string englishText)
+        {
+            // englishText = "3 minutes ago" أو "2 hours ago" أو "1 days ago"
+            var parts = englishText.Split(' '); // ["3", "minutes", "ago"]
+
+            if (parts.Length >= 3)
+            {
+                var value = parts[0];
+                var unit = parts[1];
+
+                return unit switch
+                {
+                    "minutes" => string.Format(_Localizer["MinutesAgo"], value),
+                    "minute" => string.Format(_Localizer["MinuteAgo"], value),
+                    "hours" => string.Format(_Localizer["HoursAgo"], value),
+                    "hour" => string.Format(_Localizer["HourAgo"], value),
+                    "days" => string.Format(_Localizer["DaysAgo"], value),
+                    "day" => string.Format(_Localizer["DayAgo"], value),
+                    _ => englishText
+                };
+            }
+
+            return englishText;
+        }
+
 
         private void GoBack()
         {
-            NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo("/reports");
         }
     }
 }

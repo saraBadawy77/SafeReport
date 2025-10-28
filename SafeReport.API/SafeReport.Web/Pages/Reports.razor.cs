@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Localization;
 using Microsoft.JSInterop;
 using SafeReport.Web.DTOs;
+using SafeReport.Web.ResourcesFiles;
 using SafeReport.Web.Services;
 
 namespace SafeReport.Web.Pages;
@@ -13,6 +15,8 @@ public partial class Reports
     public int? incidentTypeId;
     [Inject]
     Microsoft.JSInterop.IJSRuntime JS { get; set; }
+    [Inject]
+    IStringLocalizer<Resource> _Localizer { get; set; }
     private int? filterType;
     private DateTime? filterDate;
 
@@ -98,15 +102,15 @@ public partial class Reports
             await LoadReportsAsync();
         }
     }
-
     private async Task PrintReport(Guid id)
     {
         var success = await ReportService.PrintReportAsync(id);
         if (!success)
         {
-            await JS.InvokeVoidAsync("alert", "Failed to open PDF report.");
+            await JS.InvokeVoidAsync("alert", _Localizer["PrintFailedMessage"].Value);
         }
     }
+
     private async Task OnIncidentTypeChanged(ChangeEventArgs e)
     {
         incidentTypeId = int.TryParse(e.Value?.ToString(), out var val) ? val : null;
@@ -154,20 +158,25 @@ public partial class Reports
     }
     private async Task DeleteReport(Guid id)
     {
-        bool confirm = await JS.InvokeAsync<bool>("confirm", "Are you sure you want to delete this report?");
+        bool confirm = await JS.InvokeAsync<bool>("confirm",
+            _Localizer["ConfirmDeleteMessage"].Value);
+
         if (!confirm)
-            return; 
+            return;
+
         bool success = await ReportService.DeleteReportAsync(id);
+
         if (success)
         {
-            await JS.InvokeVoidAsync("alert", "Report deleted successfully ✅");
-            await LoadReportsAsync(); 
+            await JS.InvokeVoidAsync("alert", _Localizer["DeleteSuccessMessage"].Value);
+            await LoadReportsAsync();
         }
         else
         {
-            await JS.InvokeVoidAsync("alert", "Failed to delete the report ❌");
+            await JS.InvokeVoidAsync("alert", _Localizer["DeleteFailedMessage"].Value);
         }
     }
+
     private void ShowDetails(Guid reportId)
     {
         NavigationManager.NavigateTo($"/reportdetails/{reportId}");
