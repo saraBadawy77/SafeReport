@@ -38,7 +38,7 @@ public class ReportService : IReportService
                 if (result != null && result.Data != null)
                     return Response<PagedResultDto>.SuccessResponse(result.Data, "Request succeeded");
 
-                return Response<PagedResultDto>.FailResponse("Request succeeded but no data was returned.");
+                return Response<PagedResultDto>.SuccessResponse(null,"Request succeeded but no data was returned.");
             }
 
             return Response<PagedResultDto>.FailResponse("Failed to fetch reports or no data found.");
@@ -159,16 +159,19 @@ public class ReportService : IReportService
 
         try
         {
-            var response = await _httpClient.GetFromJsonAsync<Response<List<ReportDTO>>>(url);
+            var httpResponse = await _httpClient.GetAsync(url);
 
-            return response ?? Response<List<ReportDTO>>.FailResponse("Failed to fetch new reports.");
+            if (!httpResponse.IsSuccessStatusCode)
+                return Response<List<ReportDTO>>.FailResponse($"Failed to fetch new reports. Status code: {httpResponse.StatusCode}");
+
+            var response = await httpResponse.Content.ReadFromJsonAsync<Response<List<ReportDTO>>>();
+            return response ?? Response<List<ReportDTO>>.SuccessResponse(new List<ReportDTO>());
         }
-        catch (HttpRequestException ex)
+        catch (Exception ex)
         {
             return Response<List<ReportDTO>>.FailResponse($"Error fetching new reports: {ex.Message}");
         }
     }
-
     public async Task<Response<List<IncidentTypeDto>>> GetAllIncidentTypeAsync()
     {
         AddCultureHeader();

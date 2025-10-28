@@ -42,7 +42,7 @@ namespace SafeReport.Application.Services
             _httpContextAccessor = httpContextAccessor;
             _incidentRepository = incidentRepository;
         }
-
+         string currentCulture = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
         public async Task<Response<PagedResultDto>> GetPaginatedReportsAsync(ReportFilterDto? filter)
         {
             try
@@ -184,47 +184,6 @@ namespace SafeReport.Application.Services
 
             return PrintService.GenerateReportPdf(report, incidentType, _env);
         }
-        public async Task<Response<string>> AddReportAsync(CreateReportDto reportDto)
-        {
-            try
-            {
-                var incidentExists = await _incidentRepository.GetByIdAsync(reportDto.IncidentId);
-                if (incidentExists is null)
-                    return Response<string>.FailResponse("Invalid IncidentId.");
-                var incidentType = await _incidentTypeRepository.GetByIdAsync(reportDto.IncidentTypeId);
-                if (incidentType == null)
-                    return Response<string>.FailResponse("Incident type not found");
-
-                var selectedIncidentType = await _incidentTypeRepository.FindAsync(
-                    t => t.IncidentId == reportDto.IncidentId &&
-                         t.Id == reportDto.IncidentTypeId &&
-                         !t.IsDeleted);
-                if (selectedIncidentType is null)
-                    return Response<string>.FailResponse("The selected incident type does not belong to the chosen incident.");
-
-                var report = _mapper.Map<Report>(reportDto);
-                //        // Get address from coordinates
-                //        // report.Address = await GetAddressFromCoordinatesAsync(reportDto.Latitude, reportDto.Longitude);
-                report.Address = "El Tahrir Square, Qasr Al Doubara, Bab al Luq, Cairo, 11519, Egypt";  //for test
-
-                // رفع وحفظ الصور إذا وجدت
-                if (reportDto.Images != null && reportDto.Images.Any())
-                {
-                    report.Images = await SaveReportImagesAsync(reportDto.Images);
-                }
-                await _reportRepository.AddAsync(report);
-                await _reportRepository.SaveChangesAsync();
-
-                var reportDtoResult = _mapper.Map<ReportDto>(report);
-                await _hubContext.Clients.All.SendAsync("ReceiveNewReport", reportDtoResult);
-
-                return Response<string>.SuccessResponse("Report added successfully.");
-            }
-            catch (Exception ex)
-            {
-                return Response<string>.FailResponse($"Error adding report: {ex.Message}");
-            }
-        }
         private async Task<List<ReportImage>> SaveReportImagesAsync(List<IFormFile>? images)
         {
             var savedImages = new List<ReportImage>();
@@ -256,6 +215,89 @@ namespace SafeReport.Application.Services
 
             return savedImages;
         }
+        public async Task<Response<string>> AddReportAsync(CreateReportDto reportDto)
+        {
+            try
+            {
+                var incidentExists = await _incidentRepository.GetByIdAsync(reportDto.IncidentId);
+                if (incidentExists is null)
+                    return Response<string>.FailResponse("Invalid IncidentId.");
+
+                var incidentType = await _incidentTypeRepository.GetByIdAsync(reportDto.IncidentTypeId);
+                if (incidentType == null)
+                    return Response<string>.FailResponse("Incident type not found");
+
+                var selectedIncidentType = await _incidentTypeRepository.FindAsync(
+                    t => t.IncidentId == reportDto.IncidentId &&
+                         t.Id == reportDto.IncidentTypeId &&
+                         !t.IsDeleted);
+                if (selectedIncidentType is null)
+                    return Response<string>.FailResponse("The selected incident type does not belong to the chosen incident.");
+
+                var report = _mapper.Map<Report>(reportDto);
+                        // Get address from coordinates
+             // report.Address = await GetAddressFromCoordinatesAsync(reportDto.Latitude, reportDto.Longitude);
+                report.Address = "El Tahrir Square, Qasr Al Doubara, Bab al Luq, Cairo, 11519, Egypt";  // for test
+
+                if (reportDto.Images != null && reportDto.Images.Any())
+                {
+                    report.Images = await SaveReportImagesAsync(reportDto.Images);
+                }
+
+                await _reportRepository.AddAsync(report);
+                await _reportRepository.SaveChangesAsync();
+
+                var incidentTypeDict = (await _incidentTypeRepository.GetAllAsync())
+                    .Where(t => !t.IsDeleted)
+                    .ToDictionary(t => (t.IncidentId, t.Id),
+                                  t => currentCulture == "ar" ? t.NameAr : t.NameEn);
+
+                var reportDtoResult = MapnewReportToDto(report, incidentTypeDict, currentCulture);
+
+                // Notify clients
+                await _hubContext.Clients.All.SendAsync("ReceiveNewReport", reportDtoResult);
+
+                return Response<string>.SuccessResponse("Report added successfully.");
+            }
+            catch (Exception ex)
+            {
+                return Response<string>.FailResponse($"Error adding report: {ex.Message}");
+            }
+        }
+
+        private ReportDto MapnewReportToDto(Report report, Dictionary<(int IncidentId, int Id), string> incidentTypeDict, string currentCulture)
+        {
+            var description = currentCulture == "ar"
+                ? report.DescriptionAr ?? report.Description
+                : report.Description ?? report.DescriptionAr;
+
+            var incidentName = currentCulture == "ar"
+                ? report.Incident?.NameAr ?? report.Incident?.NameEn
+                : report.Incident?.NameEn ?? report.Incident?.NameAr;
+
+            incidentTypeDict.TryGetValue((report.IncidentId, report.IncidentTypeId), out string? incidentTypeName);
+
+            var images = report.Images?
+                .Where(img => !string.IsNullOrEmpty(img.ImagePath))
+                .Select(img => img.ImagePath)
+                .ToList() ?? new List<string>();
+
+            return new ReportDto
+            {
+                Id = report.Id,
+                Description = description,
+                CreatedDate = report.CreatedDate,
+                IncidentId = report.IncidentId,
+                IncidentName = incidentName ?? "N/A",
+                IncidentTypeId = report.IncidentTypeId,
+                IncidentTypeName = incidentTypeName ?? "N/A",
+                Address = report.Address,
+                ImagePaths = images,
+                PhoneNumber = report.PhoneNumber,
+                TimeSinceCreated = string.Empty  
+            };
+        }
+
         private async Task<string?> GetAddressFromCoordinatesAsync(double latitude, double longitude)
         {
             try
@@ -378,7 +420,7 @@ namespace SafeReport.Application.Services
                     t => incidentIds.Contains(t.IncidentId) &&
                          incidentTypeIds.Contains(t.Id) &&
                          !t.IsDeleted);
-
+                
                 var currentCulture = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
 
                 // Build dictionary for incident type names (localized)
