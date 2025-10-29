@@ -96,12 +96,14 @@ namespace SafeReport.Application.Services
 
                 // Map reports
                 var reportDtos = reports.Select(report => MapReportToDto(report, incidentTypeDict, currentCulture)).ToList();
-
+                var totalPages = (int)Math.Ceiling(totalCount / (double)filter.PageSize.Value);
                 var pagedResult = new PagedResultDto
                 {
+
                     TotalCount = totalCount,
                     PageNumber = filter.PageNumber.Value,
                     PageSize = filter.PageSize.Value,
+                    TotalPages = totalPages,
                     Reports = reportDtos
                 };
 

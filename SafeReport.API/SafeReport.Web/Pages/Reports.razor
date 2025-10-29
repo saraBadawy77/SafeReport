@@ -90,22 +90,24 @@ else
         </tbody>
     </table>
 
-    <nav>
-        <ul class="pagination">
-            <li class="page-item @(currentPage == 1 ? "disabled" : "")">
-                <button class="page-link" @onclick="PrevPage">@_Localizer["Previous"]</button>
-            </li>
-            @for (int i = 1; i <= totalPages; i++)
-            {
-                var cpage = i;
-                <li class="page-item @(currentPage == cpage ? "active" : "")">
-                    <button class="page-link" @onclick="() => GoToPage(cpage)">@cpage</button>
-                </li>
-            }
-            <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
-                <button class="page-link" @onclick="NextPage">@_Localizer["Next"]</button>
-            </li>
-        </ul>
-    </nav>
+    @if (allresponse.Reports!= null)
+    {
+        var startItem = ((currentPage - 1) * pageSize) + 1;
+        var endItem = Math.Min(currentPage * pageSize, allresponse.TotalCount);
+
+        <div class="text-muted mb-2">
+            @_Localizer["Showing"] @startItem - @endItem @_Localizer["of"] @allresponse.TotalCount @_Localizer["results"]
+        </div>
+    }
+
+    <Pagination @bind-CurrentPage="currentPage"
+                TotalPages="@totalPages"
+                PageSize="@pageSize"
+                OnPageChange="LoadData"
+                OnPageSizeChange="UpdatePageSize" />
+
+
+
+
 }
 

@@ -1,0 +1,136 @@
+﻿@using Microsoft.AspNetCore.Components
+@inject IJSRuntime JS
+
+@if (TotalPages > 1)
+{
+    <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap">
+        <!-- Page Size Dropdown -->
+        <div class="page-size-select">
+            <select class="form-select form-select-sm"
+                    style="width: 80px;"
+                    @onchange="ChangePageSize">
+                @foreach (var size in PageSizes)
+                {
+                    <option value="@size" selected="@(size == PageSize)">
+                        @size
+                    </option>
+                }
+            </select>
+        </div>
+
+        <!-- Pagination -->
+        <nav>
+            <ul class="pagination">
+
+                <!-- First -->
+                <li class="page-item @(CurrentPage == 1 ? "disabled" : "")">
+                    <button class="page-link" @onclick="() => OnChangePage(1)">⏮</button>
+                </li>
+
+                <!-- Prev -->
+                <li class="page-item @(CurrentPage == 1 ? "disabled" : "")">
+                    <button class="page-link" @onclick="() => OnChangePage(CurrentPage - 1)">⟨</button>
+                </li>
+
+                @if (StartPage > 1)
+                {
+                    <li class="page-item">
+                        <button class="page-link" @onclick="() => OnChangePage(1)">1</button>
+                    </li>
+                    @if (StartPage > 2)
+                    {
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    }
+                }
+
+                @for (int i = StartPage; i <= EndPage; i++)
+                {
+                    <li class="page-item @(CurrentPage == i ? "active" : "")">
+                        <button class="page-link" @onclick="() => OnChangePage(i)">@i</button>
+                    </li>
+                }
+
+                @if (EndPage < TotalPages)
+                {
+                    @if (EndPage < TotalPages - 1)
+                    {
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    }
+                    <li class="page-item">
+                        <button class="page-link" @onclick="() => OnChangePage(TotalPages)">@TotalPages</button>
+                    </li>
+                }
+
+                <!-- Next -->
+                <li class="page-item @(CurrentPage == TotalPages ? "disabled" : "")">
+                    <button class="page-link" @onclick="() => OnChangePage(CurrentPage + 1)">⟩</button>
+                </li>
+
+                <!-- Last -->
+                <li class="page-item @(CurrentPage == TotalPages ? "disabled" : "")">
+                    <button class="page-link" @onclick="() => OnChangePage(TotalPages)">⏭</button>
+                </li>
+            </ul>
+        </nav>
+    </div>
+}
+
+<style>
+    .pagination .page-link {
+        border-radius: 8px;
+        margin: 0 3px;
+        transition: all 0.2s ease-in-out;
+        min-width: 38px;
+        text-align: center;
+    }
+
+    .pagination .page-item.active .page-link {
+        font-weight: bold;
+        transform: scale(1.05);
+        box-shadow: 0 0 8px rgba(0, 123, 255, 0.4);
+    }
+
+    .pagination .page-link:hover:not(.disabled) {
+        transform: scale(1.08);
+        background-color: #0d6efd;
+        color: white;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public int CurrentPage { get; set; }
+    [Parameter]
+    public EventCallback<int> CurrentPageChanged { get; set; }
+
+    [Parameter] public int TotalPages { get; set; }
+    [Parameter] public int PageSize { get; set; } = 10;
+    [Parameter] public EventCallback<int> OnPageChange { get; set; }
+    [Parameter] public EventCallback<int> OnPageSizeChange { get; set; }
+
+    private List<int> PageSizes = new() { 5, 10, 20, 50 };
+
+    private int StartPage => Math.Max(1, CurrentPage - 2);
+    private int EndPage => Math.Min(TotalPages, CurrentPage + 2);
+
+    private async Task OnChangePage(int page)
+    {
+        if (page >= 1 && page <= TotalPages)
+        {
+            CurrentPage = page;
+            await CurrentPageChanged.InvokeAsync(CurrentPage);
+            await OnPageChange.InvokeAsync(CurrentPage);
+            await JS.InvokeVoidAsync("window.scrollTo", 0, 0);
+        }
+    }
+
+
+    private async Task ChangePageSize(ChangeEventArgs e)
+    {
+        PageSize = int.Parse(e.Value.ToString());
+        await OnPageSizeChange.InvokeAsync(PageSize);
+        CurrentPage = 1;
+        await OnPageChange.InvokeAsync(CurrentPage);
+    }
+
+}

@@ -12,6 +12,8 @@ public partial class Reports
     private List<ReportDTO> pagedReports = new();
     private List<Incident> reportTypes = new();
     private List<IncidentTypeDto> incidentTypes=new();
+    private PagedResultDto allresponse = new();
+
     public int? incidentTypeId;
     [Inject]
     Microsoft.JSInterop.IJSRuntime JS { get; set; }
@@ -23,6 +25,8 @@ public partial class Reports
     private int currentPage = 1;
     private int pageSize = 10;
     private int totalPages ;
+
+
 
     [Inject]
     private ReportService ReportService { get; set; } = default!;
@@ -40,6 +44,20 @@ public partial class Reports
         await LoadReportsAsync();
     }
 
+    async Task LoadData(int page)
+    {
+        currentPage = page;
+        await LoadReportsAsync();
+        StateHasChanged(); 
+    }
+
+    async Task UpdatePageSize(int newSize)
+    {
+        pageSize = newSize;
+        currentPage = 1;
+        await LoadData(currentPage);
+    }
+
     private async Task LoadReportsAsync()
     {
         var filter = new ReportFilterDto
@@ -54,8 +72,9 @@ public partial class Reports
         var response = await ReportService.GetAllReportsAsync(filter);
         if (response.Success && response.Data != null)
         {
+            allresponse = response.Data;
             pagedReports = response.Data.Reports.ToList();
-            totalPages = (int)Math.Ceiling((double)response.Data.TotalCount / pageSize);
+            totalPages = response.Data.TotalPages;
         }
         else
         {
@@ -76,32 +95,6 @@ public partial class Reports
         await LoadReportsAsync();
     }
 
-    private async Task PrevPage()
-    {
-        if (currentPage > 1)
-        {
-            currentPage--;
-            await LoadReportsAsync();
-        }
-    }
-
-    private async Task NextPage()
-    {
-        if (currentPage < totalPages)
-        {
-            currentPage++;
-            await LoadReportsAsync();
-        }
-    }
-
-    private async Task GoToPage(int page)
-    {
-        if (page >= 1 && page <= totalPages)
-        {
-            currentPage = page;
-            await LoadReportsAsync();
-        }
-    }
     private async Task PrintReport(Guid id)
     {
         var success = await ReportService.PrintReportAsync(id);
