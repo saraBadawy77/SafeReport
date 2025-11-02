@@ -204,6 +204,9 @@
   <data name="IncidentTypes" xml:space="preserve">
     <value>Incident Types</value>
   </data>
+  <data name="LangDirection" xml:space="preserve">
+    <value>ltr</value>
+  </data>
   <data name="Language" xml:space="preserve">
     <value>Language:</value>
   </data>
@@ -224,6 +227,9 @@
   </data>
   <data name="NoDetailsAvailable" xml:space="preserve">
     <value>No report details available.</value>
+  </data>
+  <data name="of" xml:space="preserve">
+    <value>of</value>
   </data>
   <data name="OtherIncidentsDescription" xml:space="preserve">
     <value>Report any other unusual or critical events. SafeReport helps monitor and manage community incidents effectively.</value>
@@ -257,6 +263,12 @@
   </data>
   <data name="Reset" xml:space="preserve">
     <value>Reset</value>
+  </data>
+  <data name="results" xml:space="preserve">
+    <value>results</value>
+  </data>
+  <data name="Showing" xml:space="preserve">
+    <value>Showing</value>
   </data>
   <data name="TimeSinceCreated" xml:space="preserve">
     <value>Time Since Created</value>

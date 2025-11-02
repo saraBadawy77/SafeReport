@@ -46,10 +46,14 @@
 
                 @for (int i = StartPage; i <= EndPage; i++)
                 {
-                    <li class="page-item @(CurrentPage == i ? "active" : "")">
-                        <button class="page-link" @onclick="() => OnChangePage(i)">@i</button>
+                    var pageNumber = i;
+                    <li class="page-item @(CurrentPage == pageNumber ? "active" : "")">
+                        <button class="page-link" @onclick="() => OnChangePage(pageNumber)">
+                            @pageNumber
+                        </button>
                     </li>
                 }
+
 
                 @if (EndPage < TotalPages)
                 {

@@ -322,6 +322,15 @@ namespace SafeReport.Web.ResourcesFiles {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ltr.
+        /// </summary>
+        public static string LangDirection {
+            get {
+                return ResourceManager.GetString("LangDirection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Language:.
         /// </summary>
         public static string Language {
@@ -381,6 +390,15 @@ namespace SafeReport.Web.ResourcesFiles {
         public static string NoDetailsAvailable {
             get {
                 return ResourceManager.GetString("NoDetailsAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to of.
+        /// </summary>
+        public static string of {
+            get {
+                return ResourceManager.GetString("of", resourceCulture);
             }
         }
         
@@ -480,6 +498,24 @@ namespace SafeReport.Web.ResourcesFiles {
         public static string Reset {
             get {
                 return ResourceManager.GetString("Reset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to results.
+        /// </summary>
+        public static string results {
+            get {
+                return ResourceManager.GetString("results", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Showing.
+        /// </summary>
+        public static string Showing {
+            get {
+                return ResourceManager.GetString("Showing", resourceCulture);
             }
         }
         

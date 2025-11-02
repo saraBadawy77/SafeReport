@@ -204,6 +204,9 @@
   <data name="IncidentTypes" xml:space="preserve">
     <value>أنواع الحوادث</value>
   </data>
+  <data name="LangDirection" xml:space="preserve">
+    <value>rtl</value>
+  </data>
   <data name="Language" xml:space="preserve">
     <value>اللغة:</value>
   </data>
@@ -224,6 +227,9 @@
   </data>
   <data name="NoDetailsAvailable" xml:space="preserve">
     <value>لا توجد تفاصيل متاحة لهذا التقرير.</value>
+  </data>
+  <data name="of" xml:space="preserve">
+    <value>من</value>
   </data>
   <data name="OtherIncidentsDescription" xml:space="preserve">
     <value>بلّغ عن أي أحداث غير اعتيادية أو حرجة أخرى. سيف ريبورت يساعد على متابعة وإدارة الحوادث المجتمعية بفعالية.</value>
@@ -257,6 +263,12 @@
   </data>
   <data name="Reset" xml:space="preserve">
     <value>إعادة تعيين</value>
+  </data>
+  <data name="results" xml:space="preserve">
+    <value>نتائج</value>
+  </data>
+  <data name="Showing" xml:space="preserve">
+    <value>عرض</value>
   </data>
   <data name="TimeSinceCreated" xml:space="preserve">
     <value>المدة منذ الإنشاء</value>
